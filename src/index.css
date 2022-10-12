@@ -122,3 +122,51 @@ input[type="search"] {
   padding-left: 0px;
   margin-left: 0 !important;
 }
+
+.r_title {
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.r_title > span  {
+  cursor: pointer;
+}
+
+.r_title > h6 {
+  margin-bottom: 0 !important;
+}
+
+h6:hover {
+  background-color: transparent !important;
+}
+
+.canvas {
+  position: relative;
+}
+
+.canvas > .functionBoard {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  background-color: white;
+  border-radius: 100%; 
+  width: 40px;
+  height: 40px;
+  display: none;
+}
+.functionBoard:hover {
+  cursor: pointer;
+}
+
+.functionBoard > i {
+  font-size: 25px;
+  color: #333;
+  margin-left: 10px;
+  margin-top: 7px;
+}
+
+.shadow-sm {
+  margin: 0 !important;
+}

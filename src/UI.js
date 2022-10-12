@@ -1,6 +1,9 @@
 import { observer } from 'mobx-react-lite';
 import React, { useEffect, useState } from 'react';
 import * as THREE from 'three';
+import './Action'
+
+import $ from 'jquery'
 
 import { MapControls, OrbitControls } from './three/OrbitControls';
 import { DRACOLoader } from './three/DRACOLoader';
@@ -16,7 +19,6 @@ import { render } from '@testing-library/react';
 
 import Navbar from "./components/Navbar"
 import Sidebar from "./components/Sidebar"
-import RoomLayout from "./components/RoomLayout";
 import { Dimensions } from "./components/dimension";
 import { Category } from './components/Category';
 
@@ -122,6 +124,9 @@ initLight();
 // const box = new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshStandardMaterial({ side: THREE.BackSide, transparent: true, color :'white' }));
 
 let InvisibleMat;
+let outlineMaterial;
+let outlineMesh;
+
 // box.geometry.translate(0, .5, 0);
 // // scene.add(box);
 
@@ -185,7 +190,7 @@ function animate() {
 
     rayWalls = [];
     for (let index = 0; index < walls_group.length; index++) {
-        if(walls_group[index].material.visible)
+        if (walls_group[index].material.visible)
             isFacingCamera(walls_group[index]);
     }
     // isFacingCamera(ceiling);
@@ -227,6 +232,10 @@ loadBathtub1();
 animate();
 
 
+var selectedFlag = false;
+var temp_object = null;
+var temp_object_real = null;
+
 
 const onmousedown = (e) => {
 
@@ -250,8 +259,9 @@ const onmousedown = (e) => {
         selectedItem = objectIntersects[0].object;
         orbitControls.enabled = false;
     }
-
 }
+
+
 
 const onmouseup = (e) => {
 
@@ -259,6 +269,26 @@ const onmouseup = (e) => {
     isDrag = false;
     orbitControls.enabled = true;
     selectedItem = null;
+
+    var objectIntersects = raycaster.intersectObjects(objects);
+
+    if (objectIntersects.length > 0 && objectIntersects[1].object.visible == true) {
+        hoverItem = objectIntersects[0].object;
+        hoverItem.material.visible = true;
+
+        if (selectedFlag) {
+            temp_object.material.visible = false
+        } else {
+            selectedFlag = true
+        }
+        temp_object = hoverItem
+        temp_object_real = objectIntersects[1].object
+        $(".functionBoard").css({"display": "block"})
+    } else if (hoverItem && !isDrag) {
+        hoverItem.material.visible = false;
+        selectedFlag = false;
+        $(".functionBoard").css({"display": "none"})
+    }
 
     Update();
 }
@@ -274,8 +304,8 @@ const onmousemove = (e) => {
         mouse.y = -((e.touches[0].clientY - rect.top) / rect.height) * 2 + 1;
     }
 
-    let temp_camera ;
-    if(STORE.view ==1)
+    let temp_camera;
+    if (STORE.view == 1)
         temp_camera = camera;
     else
         temp_camera = orthoCam;
@@ -300,19 +330,30 @@ const onmousemove = (e) => {
         selectedObject = null;
     }
 
-    var objectIntersects = raycaster.intersectObjects(objects);
+    // var objectIntersects = raycaster.intersectObjects(objects);
 
-    if (objectIntersects.length > 0) {
-        hoverItem = objectIntersects[0].object;
-        hoverItem.material.visible = true;
-    } else if (hoverItem && !isDrag) {
-        hoverItem.material.visible = false;
-    }
+    // if (objectIntersects.length > 0) {
+    //     hoverItem = objectIntersects[0].object;
+    //     hoverItem.material.visible = true;
+    // } else if (hoverItem && !isDrag) {
+    //     hoverItem.material.visible = false;
+    // }
 
 
     mapControls.enabled = false;
-
 }
+
+
+function deleteObject() {
+    console.log("here")
+    if(temp_object_real != null) {
+        temp_object.visible = false
+        temp_object_real.visible = false
+
+        temp_object_real = null
+    }
+}
+
 
 window.addEventListener('mousemove', onmousemove);
 window.addEventListener('mousedown', onmousedown);
@@ -395,7 +436,7 @@ function GenerateBathroom() {
     light_2.position.set(STORE.Width / 2, STORE.Height, 0);
 
     createWalls(STORE.type);
-     
+
 }
 
 function GenerateMeasurements() {
@@ -405,7 +446,7 @@ function GenerateMeasurements() {
         scene.remove(dims[index]);
     }
     dims = [];
-    if (STORE.view !== 1) 
+    if (STORE.view !== 1)
         new Dimensions(scene, dims, orthoCam, labelRenderer.domElement, STORE.type, temp_bathtub);
 
 }
@@ -416,7 +457,7 @@ function loadDoor() {
         'assets/doors/panel.glb',
         // called when the resource is loaded
         function (gltf) {
-            InvisibleMat = new THREE.MeshBasicMaterial({ color: 'red', visible: false, transparent: true, opacity: .3 });
+            InvisibleMat = new THREE.MeshBasicMaterial({ color: 'red', visible: false, transparent: true, opacity: .3, side: THREE.BackSide });
             temp_door = new THREE.Mesh(new THREE.BoxGeometry(wallItems.door.width, wallItems.door.height, wallItems.door.depth), InvisibleMat);
             temp_door.geometry.translate(0, wallItems.door.height * .5, 0);
             temp_door.position.set(0, 0, -STORE.Length / 2 - 0.02);
@@ -478,6 +519,7 @@ function loadBathtub1() {
 }
 
 function loadBathtub2() {
+
     gltfLoader.load(
         // resource URL
         'assets/doors/bath2.gltf',
@@ -508,7 +550,7 @@ const UI = observer(() => {
 
     const [menuOption, setMenuOption] = useState([false, false, false, false, false, false, false, false, false]);
     const [isCategory, setIsCategory] = useState(false);
-    const {isAdd, setAdd} = useState(false);
+    const { isAdd, setAdd } = useState(false);
 
     function AssignVal(e) {
 
@@ -543,9 +585,12 @@ const UI = observer(() => {
         <div className="row content" >
 
             <div className="roomsSideBar" style={{ marginLeft: (menuOption[0] && !isCategory ? 0 : -400) }}>
-                <h6 className='trig-btn  py-3 w-100 border-bottom' style={{ color: "#555", paddingLeft: "20px" }}>  Room Layout</h6>
+                <div className='d-flex r_title border-bottom'>
+                    <h6 className='trig-btn  py-3 w-100' style={{ color: "#555" }}>  Room Layout</h6>
+                    <span className='close'>X</span>
+                </div>
                 <div className="d-flex flex-wrap w-100">
-                    <h6 className='trig-btn  w-100' style={{ color: "#555", paddingLeft: "20px", height :"30px" }}> Floor  Plan</h6>
+                    <h6 className='trig-btn  w-100' style={{ color: "#555", paddingLeft: "20px", height: "30px" }}> Floor  Plan</h6>
                     <div className="d-flex flex-wrap w-100">
                         {Room_types.map(type => {
 
@@ -564,19 +609,19 @@ const UI = observer(() => {
                 <div className="d-flex flex-wrap w-100">
                     <h6 className='trig-btn py-3 w-100' style={{ color: "#555", paddingLeft: "20px" }}> Room  Dimensions</h6>
                     <div className="p-3 d-flex bg-white justify-content-between shadow-sm mb-3 flex-nowrap">
-                        <span style={{width : "220px"}}>Room Width</span>
+                        <span style={{ width: "220px" }}>Room Width</span>
                         <input onChange={AssignVal} type="range" id='width' value={STORE.width} min={2100} max={10000} className="form-range me-1" />
                         <input onChange={AssignVal} type="text" id='width' value={STORE.width} className="sizeInput"></input>
                         <span>mm</span>
                     </div>
                     <div className="p-3 d-flex bg-white justify-content-between shadow-sm mb-3 flex-nowrap">
-                        <span style={{width : "220px"}} >Room Length</span>
+                        <span style={{ width: "220px" }} >Room Length</span>
                         <input onChange={AssignVal} type="range" id='length' value={STORE.length} min={2100} max={10000} className="form-range" />
                         <input onChange={AssignVal} type="text" id='length' value={STORE.length} className="sizeInput"></input>
                         <span>mm</span>
                     </div>
                     <div className="p-3 d-flex bg-white justify-content-between shadow-sm mb-3 flex-nowrap">
-                         <span style={{width : "220px"}} >Room Height </span>
+                        <span style={{ width: "220px" }} >Room Height </span>
                         <input onChange={AssignVal} type="range" id='height' value={STORE.height} min={2000} max={10000} className="form-range" />
                         <input onChange={AssignVal} type="text" id='height' value={STORE.height} className="sizeInput"></input>
                         <span>mm</span>
@@ -584,14 +629,14 @@ const UI = observer(() => {
 
                     {STORE.type > 1 && < div >
                         <div className="p-3 d-flex bg-white justify-content-between shadow-sm mb-3 flex-nowrap">
-                            <span style={{width : "220px"}} >Cutout width </span>
+                            <span style={{ width: "220px" }} >Cutout width </span>
                             <input onChange={AssignVal} type="range" id='cwidth' value={STORE.cwidth} min={1000} max={STORE.width - 1000} className="form-range" />
                             <input onChange={AssignVal} type="text" id='cwidth' value={STORE.cwidth} className="sizeInput"></input>
                             <span>mm</span>
                         </div>
                         <div className="p-3 d-flex bg-white justify-content-between shadow-sm mb-3 flex-nowrap">
-                            <span style={{width : "230px"}} >Cutout length </span>
-                             <input onChange={AssignVal} type="range" id='clength' value={STORE.clength} min={1000} max={STORE.length - 1000} className="form-range" />
+                            <span style={{ width: "230px" }} >Cutout length </span>
+                            <input onChange={AssignVal} type="range" id='clength' value={STORE.clength} min={1000} max={STORE.length - 1000} className="form-range" />
                             <input onChange={AssignVal} type="text" id='clength' value={STORE.clength} className="sizeInput"></input>
                             <span>mm</span>
                         </div>
@@ -600,19 +645,22 @@ const UI = observer(() => {
 
             </div>
 
-            <div className='roomsSideBar' style={{ marginLeft: (menuOption[1] && !isCategory? 0 : -400) }} >
-                <h6 className='trig-btn  py-3 w-100 border-bottom' style={{ color: "#555", paddingLeft: "20px" }}> Bathroom Elements</h6>
+            <div className='roomsSideBar' style={{ marginLeft: (menuOption[1] && !isCategory ? 0 : -400) }} >
+                <div className='d-flex r_title border-bottom'>
+                    <h6 className='trig-btn  py-3 w-100' style={{ color: "#555" }}>Bathroom Elements</h6>
+                    <span className='close'>X</span>
+                </div>
                 <div className="d-flex flex-wrap w-100">
-                    <h6 className='trig-btn  w-100' style={{ color: "#555", paddingLeft: "20px", height :"30px" }}> Add Room Elements</h6>
+                    <h6 className='trig-btn  w-100' style={{ color: "#555", paddingLeft: "20px", height: "30px" }}> Add Room Elements</h6>
                     <div className="d-flex flex-wrap w-100">
                         <div className='card m-2 d-flex align-items-center text-center p-2 rounded'>
                             <span className='m-2'>Door</span>
-                            <img style={{width : "80px"}} src="assets/ui/door.svg"></img>
+                            <img style={{ width: "80px" }} src="assets/ui/door.svg"></img>
                             <div className='btn m-2 rounded-5 shadow-sm'>Add to Plan +</div>
                         </div>
                         <div className='card m-2 d-flex align-items-center text-center p-2 rounded'>
                             <span className='m-2'>Window</span>
-                            <img style={{width : "80px"}} src="assets/ui/window.svg"></img>
+                            <img style={{ width: "80px" }} src="assets/ui/window.svg"></img>
                             <div className='btn m-2 rounded-5 shadow-sm'>Add to Plan +</div>
                         </div>
                     </div>
@@ -620,59 +668,77 @@ const UI = observer(() => {
             </div>
 
             <div className='roomsSideBar' style={{ marginLeft: (menuOption[2] ? 0 : -400) }} >
-                <h6 className='trig-btn py-3 w-100 border-bottom' style={{ color: "#555", paddingLeft: "20px" }}> Bathroom Products</h6>
+                <div className='d-flex r_title border-bottom'>
+                    <h6 className='trig-btn  py-3 w-100' style={{ color: "#555" }}>Bathroom Products</h6>
+                    <span className='close'>X</span>
+                </div>
                 {
                     isCategory ? <Category
-                        isAdd = {isAdd}
-                        setAdd = {setAdd}
-                        loadBathtub = {loadBathtub}
-                        loadBathtub2 = {loadBathtub2}
-                       
-                    /> 
-                    : <><input placeholder='Search all products' type="search" className='d-flex w-100 rounded-4 shadow-sm search' style={{ height: 40, border:"none"}}/>
-                    <div className="d-flex flex-wrap w-100">
-                        <div className="d-flex flex-wrap w-100 cards">
-                            <div className='card  d-flex align-items-center text-center p-2 rounded card1' onClick={() => setIsCategory(true)}>
-                                <img src="assets/ui/e09acac1-fc05-4078-bd84-73b765c26c31.png"></img>
-                                <span className='m-2'>Baths & Spas</span>
-                            </div>
-                            <div className='card d-flex align-items-center text-center p-2 rounded card1'>
-                                <img src="assets/ui/window.svg"></img>
-                                <span className='m-2'>Window</span>
-                            </div>
-                        </div>
-                    </div></>
+                        isAdd={isAdd}
+                        setAdd={setAdd}
+                        loadBathtub={loadBathtub}
+                        loadBathtub2={loadBathtub2}
+
+                    />
+                        : <><input placeholder='Search all products' type="search" className='d-flex w-100 rounded-4 shadow-sm search' style={{ height: 40, border: "none" }} />
+                            <div className="d-flex flex-wrap w-100">
+                                <div className="d-flex flex-wrap w-100 cards">
+                                    <div className='card  d-flex align-items-center text-center p-2 rounded card1' onClick={() => setIsCategory(true)}>
+                                        <img src="assets/ui/e09acac1-fc05-4078-bd84-73b765c26c31.png"></img>
+                                        <span className='m-2'>Baths & Spas</span>
+                                    </div>
+                                    <div className='card d-flex align-items-center text-center p-2 rounded card1'>
+                                        <img src="assets/ui/window.svg"></img>
+                                        <span className='m-2'>Window</span>
+                                    </div>
+                                </div>
+                            </div></>
                 }
             </div>
 
-            <div className='roomsSideBar' style={{ marginLeft: (menuOption[3] && !isCategory? 0 : -400) }} >
-                <h6 className='trig-btn  py-3 w-100 border-bottom' style={{ color: "#555", paddingLeft: "20px" }}> Styling</h6>
+            <div className='roomsSideBar' style={{ marginLeft: (menuOption[3] && !isCategory ? 0 : -400) }} >
+                <div className='d-flex r_title border-bottom'>
+                    <h6 className='trig-btn  py-3 w-100' style={{ color: "#555" }}>Styling</h6>
+                    <span className='close'>X</span>
+                </div>
             </div>
 
-            <div className='roomsSideBar' style={{ marginLeft: (menuOption[4] && !isCategory? 0 : -400) }} >
-                <h6 className='trig-btn  py-3 w-100 border-bottom' style={{ color: "#555", paddingLeft: "20px" }}> Product Summary</h6>
+            <div className='roomsSideBar' style={{ marginLeft: (menuOption[4] && !isCategory ? 0 : -400) }} >
+                <div className='d-flex r_title border-bottom'>
+                    <h6 className='trig-btn  py-3 w-100' style={{ color: "#555" }}>Product Summary</h6>
+                    <span className='close'>X</span>
+                </div>
             </div>
 
-            <div className='roomsSideBar' style={{ marginLeft: (menuOption[5] && !isCategory? 0 : -400) }} >
-                <h6 className='trig-btn  py-3 w-100 border-bottom' style={{ color: "#555", paddingLeft: "20px" }}> Consultation</h6>
+            <div className='roomsSideBar' style={{ marginLeft: (menuOption[5] && !isCategory ? 0 : -400) }} >
+                <div className='d-flex r_title border-bottom'>
+                    <h6 className='trig-btn  py-3 w-100' style={{ color: "#555" }}>Consultation</h6>
+                    <span className='close'>X</span>
+                </div>
             </div>
 
-            <div className='roomsSideBar' style={{ marginLeft: (menuOption[6] && !isCategory? 0 : -400) }} >
-                <h6 className='trig-btn py-3 w-100 border-bottom' style={{ color: "#555", paddingLeft: "20px" }}> Exit Plan</h6>
+            <div className='roomsSideBar' style={{ marginLeft: (menuOption[6] && !isCategory ? 0 : -400) }} >
+                <div className='d-flex r_title border-bottom'>
+                    <h6 className='trig-btn  py-3 w-100' style={{ color: "#555" }}>Exit Plan</h6>
+                    <span className='close'>X</span>
+                </div>
             </div>
             <div className="col-12 position-relative p-0 m-0">
                 <div id='measures' style={{ display: STORE.view !== 1 ? '' : 'none' }} className="top-0 start-0 position-absolute w-100 h-100">
 
                 </div>
-                <div id="canvas-container" className='border col-12'>
+                <div className='canvas'>
+                    <div id="canvas-container" className='border col-12'>
 
+                    </div>
+                    <div className='functionBoard' onClick={() => { deleteObject() }}><i className='fa fa-trash'></i></div>
                 </div>
-                <div className="rightSideBar" style={{left : window.innerWidth -150}}>
+                <div className="rightSideBar" style={{ left: window.innerWidth - 150 }}>
                     <div>
                         <img onClick={e => STORE.view = 0} className={(STORE.view === 0 ? 'active ' : '') + 'btn p-2 bg-light m-3 rounded-1'} src="assets/ui/2d.svg" alt="" />
-                        <img onClick={e => STORE.view = 1} className={(STORE.view === 1 ? 'active ' : '') + 'btn p-2 bg-light  m-3 rounded-1'}  src="assets/ui/3d_view.png" alt="" />
-                        <img onClick ={e=> STORE.scale +=0.1 } className='d-block shadow-focus btn p-2 bg-light  m-3 rounded-1'   src="assets/ui/zoomin.svg" alt="" />
-                        <img className='d-block shadow-focus btn p-2 bg-light  m-3 rounded-1'   src="assets/ui/zoomout.svg" alt="" />
+                        <img onClick={e => STORE.view = 1} className={(STORE.view === 1 ? 'active ' : '') + 'btn p-2 bg-light  m-3 rounded-1'} src="assets/ui/3d_view.png" alt="" />
+                        <img onClick={e => STORE.scale += 0.1} className='d-block shadow-focus btn p-2 bg-light  m-3 rounded-1' src="assets/ui/zoomin.svg" alt="" />
+                        <img className='d-block shadow-focus btn p-2 bg-light  m-3 rounded-1' src="assets/ui/zoomout.svg" alt="" />
                     </div>
                 </div>
             </div>
