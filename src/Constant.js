@@ -18,7 +18,7 @@ export const DELTA_DIS = 1.0;
 export const WALL_MAP = [
     {
         name: 'tile1',
-        diffuse: 'tiled1.jpg',
+        diffuse: 'tiled2.png',
         specular: 'tiles1.png',
         normal: 'tilen1.png'
     }
@@ -71,6 +71,12 @@ export const wallItems = {
         height: 2.05,
         depth: .15
     },
+    shower: {
+        type: "SHOWER",
+        width: .91,
+        height: 2.05,
+        depth: .15
+    },
     bathtub : {
         type: "BATHTUB",
         width: 1.8,
@@ -85,6 +91,12 @@ export const wallItems = {
     },
     bathtub2 : {
         type: "BATH1",
+        width: 1.8,
+        height: 0.8,
+        depth: 1.0
+    },
+    tapware : {
+        type: "TAPWARE",
         width: 1.8,
         height: 0.8,
         depth: 1.0

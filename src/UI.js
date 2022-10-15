@@ -22,17 +22,21 @@ import Sidebar from "./components/Sidebar"
 import { Dimensions } from "./components/dimension";
 import { Category } from './components/Category';
 
-const Room_types = [1, 2, 3, 4, 5];
+const Room_types = [1, 2, 3, 4, 5, 6];
 
 let walls_group = [];
 let door = null;
+let shower = null;
 let bathtub = null;
 let bathtub1 = null;
 let bathtub2 = null;
+let tapware = null;
 let temp_bathtub = null;
 let temp_bathtub1 = null;
 let temp_bathtub2 = null;
+let temp_tapware = null;
 let temp_door = null;
+let temp_shower = null;
 
 let dims = [];
 
@@ -95,24 +99,31 @@ initOrbit();
 const frustum = 1000;
 const orthoCam = new THREE.OrthographicCamera(-window.innerWidth / 2, window.innerWidth / 2, window.innerHeight / 2, -window.innerHeight / 2, 0, 30);
 
-// const orthoCam = new THREE.OrthographicCamera(-frustum, frustum, frustum, -frustum, 0, 30);
-orthoCam.zoom = STORE.Scale * 100;
-const mapControls = new MapControls(orthoCam, labelRenderer.domElement);
+var mapControls;
+var global_light
+var light_1;
+var light_2;
 
-mapControls.zoomSpeed = .1;
-mapControls.enableRotate = false;
-mapControls.screenSpacePanning = false;
-mapControls.minZoom = 100;
-mapControls.maxZoom = frustum;
-orthoCam.updateProjectionMatrix();
+function init() {
+    // const orthoCam = new THREE.OrthographicCamera(-frustum, frustum, frustum, -frustum, 0, 30);
+    orthoCam.zoom = STORE.Scale * 100;
+    console.log(orthoCam.zoom )
+    mapControls = new MapControls(orthoCam, labelRenderer.domElement);
 
-
-
-const global_light = new THREE.HemisphereLight('white', '', 0.5);
-const light_1 = new THREE.PointLight('white', .2, 20, 1);
-const light_2 = new THREE.PointLight('white', .2, 20, 1);
+    mapControls.zoomSpeed = .1;
+    mapControls.enableRotate = false;
+    mapControls.screenSpacePanning = false;
+    mapControls.minZoom = 100;
+    mapControls.maxZoom = frustum;
+    orthoCam.updateProjectionMatrix();
+}
+init()
 
 function initLight() {
+    global_light = new THREE.HemisphereLight('white', '', 0.5);
+    light_1 = new THREE.PointLight('white', .2, 20, 1);
+    light_2 = new THREE.PointLight('white', .2, 20, 1);
+
     scene.add(global_light, light_1, light_2);
     global_light.position.set(10, 10, 10);
 }
@@ -120,12 +131,9 @@ function initLight() {
 initLight();
 
 
-
 // const box = new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshStandardMaterial({ side: THREE.BackSide, transparent: true, color :'white' }));
 
 let InvisibleMat;
-let outlineMaterial;
-let outlineMesh;
 
 // box.geometry.translate(0, .5, 0);
 // // scene.add(box);
@@ -170,8 +178,6 @@ function DragObject(vec3, object, selectedwall) {
     }
 
 }
-
-
 
 function isFacingCamera(object) {
     let v = new Vector3();
@@ -221,7 +227,6 @@ function resize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     renderer.setSize(window.innerWidth, window.innerHeight);
     labelRenderer.setSize(container.clientWidth, container.clientWidth);
-
 }
 
 window.addEventListener('resize', resize, false);
@@ -283,11 +288,11 @@ const onmouseup = (e) => {
         }
         temp_object = hoverItem
         temp_object_real = objectIntersects[1].object
-        $(".functionBoard").css({"display": "block"})
+        $(".functionBoard").css({ "display": "block" })
     } else if (hoverItem && !isDrag) {
         hoverItem.material.visible = false;
         selectedFlag = false;
-        $(".functionBoard").css({"display": "none"})
+        $(".functionBoard").css({ "display": "none" })
     }
 
     Update();
@@ -316,7 +321,6 @@ const onmousemove = (e) => {
 
         selectedObject = intersects[0].object;
         if (isMouseDown && selectedItem) {
-            console.log(intersects[0].point);
             if (selectedItem.userData.normalAxis === AXIS.Y && selectedObject.userData.normalAxis === AXIS.Y) {
                 DragObject(intersects[0].point, selectedItem, selectedObject);
             }
@@ -346,7 +350,7 @@ const onmousemove = (e) => {
 
 function deleteObject() {
     console.log("here")
-    if(temp_object_real != null) {
+    if (temp_object_real != null) {
         temp_object.visible = false
         temp_object_real.visible = false
 
@@ -457,7 +461,7 @@ function loadDoor() {
         'assets/doors/panel.glb',
         // called when the resource is loaded
         function (gltf) {
-            InvisibleMat = new THREE.MeshBasicMaterial({ color: 'red', visible: false, transparent: true, opacity: .3, side: THREE.BackSide });
+            InvisibleMat = new THREE.MeshBasicMaterial({ color: 'red', visible: false, transparent: true, opacity: .3});
             temp_door = new THREE.Mesh(new THREE.BoxGeometry(wallItems.door.width, wallItems.door.height, wallItems.door.depth), InvisibleMat);
             temp_door.geometry.translate(0, wallItems.door.height * .5, 0);
             temp_door.position.set(0, 0, -STORE.Length / 2 - 0.02);
@@ -468,6 +472,28 @@ function loadDoor() {
             temp_door.add(door);
             scene.add(temp_door);
             objects.push(temp_door);
+        },
+    );
+}
+
+function Shower() {
+    gltfLoader.load(
+        // resource URL
+        'assets/doors/shower.glb',
+        // called when the resource is loaded
+        function (gltf) {
+            shower = gltf.scene;
+            InvisibleMat = new THREE.MeshBasicMaterial({ color: 'red', visible: false, transparent: true, opacity: .3 });
+            temp_shower = new THREE.Mesh(new THREE.BoxGeometry(wallItems.shower.width, wallItems.shower.height, wallItems.shower.depth * 5), InvisibleMat);
+            temp_shower.geometry.translate(0, wallItems.shower.height * .5, 0);
+            temp_shower.position.set(0, 0, STORE.Length / 2 - 0.1);
+            temp_shower.userData.normalAxis = AXIS.Z;
+            temp_shower.userData.normalVector = new Vector3(0, 0, 1);
+            shower.children[0].material.visible = true;
+            temp_shower.userData.dir = DIR.START;
+            temp_shower.add(shower);
+            scene.add(temp_shower);
+            objects.push(temp_shower);
         },
     );
 }
@@ -496,6 +522,29 @@ function loadBathtub() {
     );
 }
 
+function loadBathtub2() {
+    gltfLoader.load(
+        // resource URL
+        'assets/doors/bath2.gltf',
+        function (gltf) {
+            bathtub2 = gltf.scene;
+            bathtub2.scale.x = 0.9;
+            bathtub2.scale.y = 0.9;
+            bathtub2.scale.z = 0.9;
+            bathtub2.rotation.y = Math.PI;
+            InvisibleMat = new THREE.MeshBasicMaterial({ color: 'red', visible: false, transparent: true, opacity: .3 });
+            temp_bathtub2 = new THREE.Mesh(new THREE.BoxGeometry(wallItems.bathtub2.width, wallItems.bathtub2.height, wallItems.bathtub2.depth), InvisibleMat);
+            temp_bathtub2.geometry.translate(0, wallItems.bathtub2.height * .5, 0);
+            temp_bathtub2.position.set(1, 0, 1);
+            temp_bathtub2.userData.normalAxis = AXIS.Y;
+            bathtub2.children[0].material.visible = true;
+            temp_bathtub2.add(bathtub2);
+            scene.add(temp_bathtub2);
+            objects.push(temp_bathtub2);
+        },
+    );
+}
+
 function loadBathtub1() {
     gltfLoader.load(
         // resource URL
@@ -518,26 +567,26 @@ function loadBathtub1() {
     );
 }
 
-function loadBathtub2() {
+function loadTapware() {
 
     gltfLoader.load(
         // resource URL
-        'assets/doors/bath2.gltf',
+        'assets/doors/tapware.gltf',
         function (gltf) {
-            bathtub2 = gltf.scene;
-            bathtub2.scale.y = 1.1;
-            bathtub2.scale.x = 1.1;
-            bathtub2.scale.z = 1.1;
-            bathtub2.rotation.y = Math.PI;
+            tapware = gltf.scene;
+            tapware.scale.y = 2;
+            tapware.scale.x = 2;
+            tapware.scale.z = 2;
+            tapware.rotation.y = Math.PI;
             InvisibleMat = new THREE.MeshBasicMaterial({ color: 'red', visible: false, transparent: true, opacity: .3 });
-            temp_bathtub2 = new THREE.Mesh(new THREE.BoxGeometry(wallItems.bathtub2.width, wallItems.bathtub2.height, wallItems.bathtub2.depth), InvisibleMat);
-            temp_bathtub2.geometry.translate(0, wallItems.bathtub2.height * .5, 0);
-            temp_bathtub2.position.set(1, 0, 1);
-            temp_bathtub2.userData.normalAxis = AXIS.Y;
-            bathtub2.children[0].material.visible = true;
-            temp_bathtub2.add(bathtub2);
-            scene.add(temp_bathtub2);
-            objects.push(temp_bathtub2);
+            temp_tapware = new THREE.Mesh(new THREE.BoxGeometry(wallItems.tapware.width / 10, wallItems.tapware.height / 2, wallItems.tapware.depth / 2), InvisibleMat);
+            temp_tapware.geometry.translate(0, wallItems.tapware.height * .01, 0);
+            temp_tapware.position.set(1, 0.12, 1);
+            temp_tapware.userData.normalAxis = AXIS.Y;
+            tapware.children[0].material.visible = true;
+            temp_tapware.add(tapware);
+            scene.add(temp_tapware);
+            objects.push(temp_tapware);
         },
     );
 }
@@ -577,7 +626,6 @@ const UI = observer(() => {
     return <div className='container vh-100 overflow-auto'>
         <Navbar />
         <Sidebar
-
             menuOption={menuOption}
             setMenuOption={setMenuOption}
             setIsCategory={setIsCategory}
@@ -586,7 +634,7 @@ const UI = observer(() => {
 
             <div className="roomsSideBar" style={{ marginLeft: (menuOption[0] && !isCategory ? 0 : -400) }}>
                 <div className='d-flex r_title border-bottom'>
-                    <h6 className='trig-btn  py-3 w-100' style={{ color: "#555" }}>  Room Layout</h6>
+                    <h6 className='trig-btn  py-3 w-100' style={{ color: "#555", marginTop: "0" }}>  Room Layout</h6>
                     <span className='close'>X</span>
                 </div>
                 <div className="d-flex flex-wrap w-100">
@@ -647,7 +695,7 @@ const UI = observer(() => {
 
             <div className='roomsSideBar' style={{ marginLeft: (menuOption[1] && !isCategory ? 0 : -400) }} >
                 <div className='d-flex r_title border-bottom'>
-                    <h6 className='trig-btn  py-3 w-100' style={{ color: "#555" }}>Bathroom Elements</h6>
+                    <h6 className='trig-btn  py-3 w-100' style={{ color: "#555", marginTop: "0" }}>Bathroom Elements</h6>
                     <span className='close'>X</span>
                 </div>
                 <div className="d-flex flex-wrap w-100">
@@ -669,7 +717,7 @@ const UI = observer(() => {
 
             <div className='roomsSideBar' style={{ marginLeft: (menuOption[2] ? 0 : -400) }} >
                 <div className='d-flex r_title border-bottom'>
-                    <h6 className='trig-btn  py-3 w-100' style={{ color: "#555" }}>Bathroom Products</h6>
+                    <h6 className='trig-btn  py-3 w-100' style={{ color: "#555", marginTop: "0" }}>Bathroom Products</h6>
                     <span className='close'>X</span>
                 </div>
                 {
@@ -680,46 +728,86 @@ const UI = observer(() => {
                         loadBathtub2={loadBathtub2}
 
                     />
-                        : <><input placeholder='Search all products' type="search" className='d-flex w-100 rounded-4 shadow-sm search' style={{ height: 40, border: "none" }} />
-                            <div className="d-flex flex-wrap w-100">
-                                <div className="d-flex flex-wrap w-100 cards">
-                                    <div className='card  d-flex align-items-center text-center p-2 rounded card1' onClick={() => setIsCategory(true)}>
-                                        <img src="assets/ui/e09acac1-fc05-4078-bd84-73b765c26c31.png"></img>
-                                        <span className='m-2'>Baths & Spas</span>
-                                    </div>
-                                    <div className='card d-flex align-items-center text-center p-2 rounded card1'>
-                                        <img src="assets/ui/window.svg"></img>
-                                        <span className='m-2'>Window</span>
+                        : <>
+                            <input placeholder='Search all products' type="search" className='d-flex w-100 rounded-4 shadow-sm search' style={{ height: 40, border: "none" }} />
+                            <div className='main_window'>
+                                <div className="d-flex flex-wrap w-100">
+                                    <div className="d-flex flex-wrap w-100 cards">
+                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1' onClick={() => setIsCategory(true)}>
+                                            <img src="assets/ui/e09acac1-fc05-4078-bd84-73b765c26c31.png"></img>
+                                            <span className='m-2'>Baths & Spas</span>
+                                        </div>
+                                        <div className='card d-flex align-items-center text-center p-2 rounded card1'>
+                                            <img src="assets/ui/Vanities.png"></img>
+                                            <span className='m-2'>Vanities</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div></>
+                                <div className="d-flex flex-wrap w-100">
+                                    <div className="d-flex flex-wrap w-100 cards">
+                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1' onClick={() => setIsCategory(true)}>
+                                            <img src="assets/ui/Shavers and Mirrors.png"></img>
+                                            <span className='m-2'>Shavers & Mirrors</span>
+                                        </div>
+                                        <div className='card d-flex align-items-center text-center p-2 rounded card1'>
+                                            <img src="assets/ui/Basins.png"></img>
+                                            <span className='m-2'>Basins</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="d-flex flex-wrap w-100">
+                                    <div className="d-flex flex-wrap w-100 cards">
+                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1' onClick={() => Shower()}>
+                                            <img src="assets/ui/Showers.png"></img>
+                                            <span className='m-2'>Showers</span>
+                                        </div>
+                                        <div className='card d-flex align-items-center text-center p-2 rounded card1' onClick={() => loadTapware()}>
+                                            <img src="assets/ui/Tapware & Accessories.png"></img>
+                                            <span className='m-2'>Tapware & Accessories</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="d-flex flex-wrap w-100">
+                                    <div className="d-flex flex-wrap w-100 cards">
+                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1' onClick={() => setIsCategory(true)}>
+                                            <img src="assets/ui/Toilets.png"></img>
+                                            <span className='m-2'>Toilets</span>
+                                        </div>
+                                        <div className='card d-flex align-items-center text-center p-2 rounded card1'>
+                                            <img src="assets/ui/Wastes & Plumbing.png"></img>
+                                            <span className='m-2'>Wastes & Plumbing</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </>
                 }
             </div>
 
             <div className='roomsSideBar' style={{ marginLeft: (menuOption[3] && !isCategory ? 0 : -400) }} >
                 <div className='d-flex r_title border-bottom'>
-                    <h6 className='trig-btn  py-3 w-100' style={{ color: "#555" }}>Styling</h6>
+                    <h6 className='trig-btn  py-3 w-100' style={{ color: "#555", marginTop: "0" }}>Styling</h6>
                     <span className='close'>X</span>
                 </div>
             </div>
 
             <div className='roomsSideBar' style={{ marginLeft: (menuOption[4] && !isCategory ? 0 : -400) }} >
                 <div className='d-flex r_title border-bottom'>
-                    <h6 className='trig-btn  py-3 w-100' style={{ color: "#555" }}>Product Summary</h6>
+                    <h6 className='trig-btn  py-3 w-100' style={{ color: "#555", marginTop: "0" }}>Product Summary</h6>
                     <span className='close'>X</span>
                 </div>
             </div>
 
             <div className='roomsSideBar' style={{ marginLeft: (menuOption[5] && !isCategory ? 0 : -400) }} >
                 <div className='d-flex r_title border-bottom'>
-                    <h6 className='trig-btn  py-3 w-100' style={{ color: "#555" }}>Consultation</h6>
+                    <h6 className='trig-btn  py-3 w-100' style={{ color: "#555", marginTop: "0" }}>Consultation</h6>
                     <span className='close'>X</span>
                 </div>
             </div>
 
             <div className='roomsSideBar' style={{ marginLeft: (menuOption[6] && !isCategory ? 0 : -400) }} >
                 <div className='d-flex r_title border-bottom'>
-                    <h6 className='trig-btn  py-3 w-100' style={{ color: "#555" }}>Exit Plan</h6>
+                    <h6 className='trig-btn  py-3 w-100' style={{ color: "#555", marginTop: "0" }}>Exit Plan</h6>
                     <span className='close'>X</span>
                 </div>
             </div>
@@ -728,17 +816,20 @@ const UI = observer(() => {
 
                 </div>
                 <div className='canvas'>
-                    <div id="canvas-container" className='border col-12'>
+                    <div id="canvas-container" className='border col-12' style={{"backgroundColor": "#ddd"}}>
 
                     </div>
                     <div className='functionBoard' onClick={() => { deleteObject() }}><i className='fa fa-trash'></i></div>
                 </div>
                 <div className="rightSideBar" style={{ left: window.innerWidth - 150 }}>
                     <div>
-                        <img onClick={e => STORE.view = 0} className={(STORE.view === 0 ? 'active ' : '') + 'btn p-2 bg-light m-3 rounded-1'} src="assets/ui/2d.svg" alt="" />
-                        <img onClick={e => STORE.view = 1} className={(STORE.view === 1 ? 'active ' : '') + 'btn p-2 bg-light  m-3 rounded-1'} src="assets/ui/3d_view.png" alt="" />
-                        <img onClick={e => STORE.scale += 0.1} className='d-block shadow-focus btn p-2 bg-light  m-3 rounded-1' src="assets/ui/zoomin.svg" alt="" />
-                        <img className='d-block shadow-focus btn p-2 bg-light  m-3 rounded-1' src="assets/ui/zoomout.svg" alt="" />
+                        <img onClick={e => STORE.view = 0} className={(STORE.view === 0 ? 'active ' : '') + 'btn p-2 bg-light m-3 rounded-1 padding'} src="assets/ui/2d.png" alt="" />
+                        <img onClick={e => STORE.view = 1} className={(STORE.view === 1 ? 'active ' : '') + 'btn p-2 bg-light  m-3 rounded-1 padding'} src="assets/ui/3d.png" alt="" />
+                        <img className="btn p-2 bg-light  m-3 rounded-1 padding" src="assets/ui/VR.png" alt="" />
+                        <img onClick={e => {STORE.scale += 0.1; console.log(STORE.scale); init()}} className='d-block shadow-focus btn p-2 bg-light  m-3 rounded-1 radius' src="assets/ui/zoomin.svg" alt="" />
+                        <img className='d-block shadow-focus btn p-2 bg-light  m-3 rounded-1 radius' src="assets/ui/zoomout.svg" alt="" />
+                        <img className='d-block shadow-focus btn p-2 bg-light  m-3 rounded-1 radius' src="assets/ui/zoomout.svg" alt="" />
+                        <img className='d-block shadow-focus btn p-2 bg-light  m-3 rounded-1 radius' src="assets/ui/zoomout.svg" alt="" />
                     </div>
                 </div>
             </div>
