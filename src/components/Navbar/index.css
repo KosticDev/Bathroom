@@ -6,3 +6,7 @@
     left:0px;
     position:fixed;
 }
+
+.b_login {
+    cursor: pointer;
+}
