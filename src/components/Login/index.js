@@ -1,5 +1,6 @@
 import './login.css'
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 
 export default function Login() {
 
@@ -75,10 +76,10 @@ export default function Login() {
     return (
         <div className="login">
             <div className='main_login'>
-                <div className='return'>
+                <Link to='/' className='return'>
                     <i className='fa fa-arrow-left'></i>
                     <span> Return to homepage</span>
-                </div>
+                </Link>
                 <div className='main_content'>
                     <div className='left_page'>
                         <img src='./logo2.png' alt="" />
