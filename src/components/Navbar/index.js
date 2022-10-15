@@ -1,5 +1,4 @@
 import "./index.css"
-import { Link } from 'react-router-dom'
 
 const Navbar = () => {
     return <div className='header'>
@@ -9,7 +8,7 @@ const Navbar = () => {
                 <img src="logo1.png" height={'100%'} alt="" />
             </div>
             <div>
-                <a href="login">Login/SingIn</a>
+                Login/SingIn
             </div>
         </div>
     </div>
