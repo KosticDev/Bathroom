@@ -21,6 +21,8 @@ import Navbar from "./components/Navbar"
 import Sidebar from "./components/Sidebar"
 import { Dimensions } from "./components/dimension";
 import { Category } from './components/Category';
+import storage from './components/Firebase/firebaseConfig';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage'
 
 const Room_types = [1, 2, 3, 4, 5, 6];
 
@@ -107,7 +109,7 @@ var light_2;
 function init() {
     // const orthoCam = new THREE.OrthographicCamera(-frustum, frustum, frustum, -frustum, 0, 30);
     orthoCam.zoom = STORE.Scale * 100;
-    console.log(orthoCam.zoom )
+    console.log(orthoCam.zoom)
     mapControls = new MapControls(orthoCam, labelRenderer.domElement);
 
     mapControls.zoomSpeed = .1;
@@ -461,7 +463,7 @@ function loadDoor() {
         'assets/doors/panel.glb',
         // called when the resource is loaded
         function (gltf) {
-            InvisibleMat = new THREE.MeshBasicMaterial({ color: 'red', visible: false, transparent: true, opacity: .3});
+            InvisibleMat = new THREE.MeshBasicMaterial({ color: 'red', visible: false, transparent: true, opacity: .3 });
             temp_door = new THREE.Mesh(new THREE.BoxGeometry(wallItems.door.width, wallItems.door.height, wallItems.door.depth), InvisibleMat);
             temp_door.geometry.translate(0, wallItems.door.height * .5, 0);
             temp_door.position.set(0, 0, -STORE.Length / 2 - 0.02);
@@ -600,7 +602,12 @@ const UI = observer(() => {
     const [menuOption, setMenuOption] = useState([false, false, false, false, false, false, false, false, false]);
     const [isCategory, setIsCategory] = useState(false);
     const { isAdd, setAdd } = useState(false);
+    const [file, setFile] = useState("");
+    const [percent, setPercent] = useState(0);
+    const [show, setShow] = useState(false);
+    const [imageURL, setImageURL] = useState();
 
+    console.log(show,"ui")
     function AssignVal(e) {
 
         STORE[e.target.id] = e.target.value;
@@ -619,6 +626,38 @@ const UI = observer(() => {
         }
     }
 
+    function handleChange(event) {
+        setFile(event.target.files[0]);
+    }
+
+    function handleUpload() {
+        if (!file) {
+            alert("Please choose a file first!");
+        }
+
+        const storageRef = ref(storage, `/Tapware & Accessories/${file.name}`);
+        const uploadTask = uploadBytesResumable(storageRef, file);
+
+        uploadTask.on(
+            "state_changed",
+            (snapshot) => {
+                const percent = Math.round(
+                    (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+                );
+
+                //update progress
+                setPercent(percent);
+            },
+            (err) => console.log(err),
+            () => {
+                //download url
+                getDownloadURL(uploadTask.snapshot.ref).then((url) => {
+                    console.log(url);
+                    setImageURL(url);
+                });
+            }
+        );
+    }
 
     Update();
 
@@ -657,19 +696,19 @@ const UI = observer(() => {
                 <div className="d-flex flex-wrap w-100">
                     <h6 className='trig-btn py-3 w-100' style={{ color: "#555", paddingLeft: "20px" }}> Room  Dimensions</h6>
                     <div className="p-3 d-flex bg-white justify-content-between shadow-sm mb-3 flex-nowrap">
-                        <span style={{ width: "220px" }}>Room Width</span>
+                        <span style={{ width: "100%" }}>Room Width</span>
                         <input onChange={AssignVal} type="range" id='width' value={STORE.width} min={2100} max={10000} className="form-range me-1" />
                         <input onChange={AssignVal} type="text" id='width' value={STORE.width} className="sizeInput"></input>
                         <span>mm</span>
                     </div>
                     <div className="p-3 d-flex bg-white justify-content-between shadow-sm mb-3 flex-nowrap">
-                        <span style={{ width: "220px" }} >Room Length</span>
+                        <span style={{ width: "100%" }} >Room Length</span>
                         <input onChange={AssignVal} type="range" id='length' value={STORE.length} min={2100} max={10000} className="form-range" />
                         <input onChange={AssignVal} type="text" id='length' value={STORE.length} className="sizeInput"></input>
                         <span>mm</span>
                     </div>
                     <div className="p-3 d-flex bg-white justify-content-between shadow-sm mb-3 flex-nowrap">
-                        <span style={{ width: "220px" }} >Room Height </span>
+                        <span style={{ width: "100%" }} >Room Height </span>
                         <input onChange={AssignVal} type="range" id='height' value={STORE.height} min={2000} max={10000} className="form-range" />
                         <input onChange={AssignVal} type="text" id='height' value={STORE.height} className="sizeInput"></input>
                         <span>mm</span>
@@ -677,13 +716,13 @@ const UI = observer(() => {
 
                     {STORE.type > 1 && < div >
                         <div className="p-3 d-flex bg-white justify-content-between shadow-sm mb-3 flex-nowrap">
-                            <span style={{ width: "220px" }} >Cutout width </span>
+                            <span style={{ width: "100%" }} >Cutout width </span>
                             <input onChange={AssignVal} type="range" id='cwidth' value={STORE.cwidth} min={1000} max={STORE.width - 1000} className="form-range" />
                             <input onChange={AssignVal} type="text" id='cwidth' value={STORE.cwidth} className="sizeInput"></input>
                             <span>mm</span>
                         </div>
                         <div className="p-3 d-flex bg-white justify-content-between shadow-sm mb-3 flex-nowrap">
-                            <span style={{ width: "230px" }} >Cutout length </span>
+                            <span style={{ width: "100%" }} >Cutout length </span>
                             <input onChange={AssignVal} type="range" id='clength' value={STORE.clength} min={1000} max={STORE.length - 1000} className="form-range" />
                             <input onChange={AssignVal} type="text" id='clength' value={STORE.clength} className="sizeInput"></input>
                             <span>mm</span>
@@ -700,16 +739,48 @@ const UI = observer(() => {
                 </div>
                 <div className="d-flex flex-wrap w-100">
                     <h6 className='trig-btn  w-100' style={{ color: "#555", paddingLeft: "20px", height: "30px" }}> Add Room Elements</h6>
-                    <div className="d-flex flex-wrap w-100">
-                        <div className='card m-2 d-flex align-items-center text-center p-2 rounded'>
-                            <span className='m-2'>Door</span>
-                            <img style={{ width: "80px" }} src="assets/ui/door.svg"></img>
-                            <div className='btn m-2 rounded-5 shadow-sm'>Add to Plan +</div>
-                        </div>
-                        <div className='card m-2 d-flex align-items-center text-center p-2 rounded'>
-                            <span className='m-2'>Window</span>
-                            <img style={{ width: "80px" }} src="assets/ui/window.svg"></img>
-                            <div className='btn m-2 rounded-5 shadow-sm'>Add to Plan +</div>
+                    <div className="height_vh">
+                        <div className="d-flex flex-wrap w-100 justify">
+                            <div className='card m-2 d-flex align-items-center text-center p-2 rounded'>
+                                <span className='m-2'>Door</span>
+                                <img style={{ width: "80px" }} src="assets/ui/door.svg"></img>
+                                <div className='btn m-2 rounded-5 shadow-sm'>Add to Plan +</div>
+                            </div>
+                            <div className='card m-2 d-flex align-items-center text-center p-2 rounded'>
+                                <span className='m-2'>Window</span>
+                                <img style={{ width: "80px" }} src="assets/ui/window.svg"></img>
+                                <div className='btn m-2 rounded-5 shadow-sm'>Add to Plan +</div>
+                            </div>
+                            <div className='card m-2 d-flex align-items-center text-center p-2 rounded'>
+                                <span className='m-2'>Door</span>
+                                <img style={{ width: "80px" }} src="assets/ui/door.svg"></img>
+                                <div className='btn m-2 rounded-5 shadow-sm'>Add to Plan +</div>
+                            </div>
+                            <div className='card m-2 d-flex align-items-center text-center p-2 rounded'>
+                                <span className='m-2'>Window</span>
+                                <img style={{ width: "80px" }} src="assets/ui/window.svg"></img>
+                                <div className='btn m-2 rounded-5 shadow-sm'>Add to Plan +</div>
+                            </div>
+                            <div className='card m-2 d-flex align-items-center text-center p-2 rounded'>
+                                <span className='m-2'>Door</span>
+                                <img style={{ width: "80px" }} src="assets/ui/door.svg"></img>
+                                <div className='btn m-2 rounded-5 shadow-sm'>Add to Plan +</div>
+                            </div>
+                            <div className='card m-2 d-flex align-items-center text-center p-2 rounded'>
+                                <span className='m-2'>Window</span>
+                                <img style={{ width: "80px" }} src="assets/ui/window.svg"></img>
+                                <div className='btn m-2 rounded-5 shadow-sm'>Add to Plan +</div>
+                            </div>
+                            <div className='card m-2 d-flex align-items-center text-center p-2 rounded'>
+                                <span className='m-2'>Door</span>
+                                <img style={{ width: "80px" }} src="assets/ui/door.svg"></img>
+                                <div className='btn m-2 rounded-5 shadow-sm'>Add to Plan +</div>
+                            </div>
+                            <div className='card m-2 d-flex align-items-center text-center p-2 rounded'>
+                                <span className='m-2'>Window</span>
+                                <img style={{ width: "80px" }} src="assets/ui/window.svg"></img>
+                                <div className='btn m-2 rounded-5 shadow-sm'>Add to Plan +</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -726,6 +797,8 @@ const UI = observer(() => {
                         setAdd={setAdd}
                         loadBathtub={loadBathtub}
                         loadBathtub2={loadBathtub2}
+                        show={show}
+                        setShow={setShow}
 
                     />
                         : <>
@@ -745,7 +818,7 @@ const UI = observer(() => {
                                 </div>
                                 <div className="d-flex flex-wrap w-100">
                                     <div className="d-flex flex-wrap w-100 cards">
-                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1' onClick={() => setIsCategory(true)}>
+                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1'>
                                             <img src="assets/ui/Shavers and Mirrors.png"></img>
                                             <span className='m-2'>Shavers & Mirrors</span>
                                         </div>
@@ -769,7 +842,7 @@ const UI = observer(() => {
                                 </div>
                                 <div className="d-flex flex-wrap w-100">
                                     <div className="d-flex flex-wrap w-100 cards">
-                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1' onClick={() => setIsCategory(true)}>
+                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1'>
                                             <img src="assets/ui/Toilets.png"></img>
                                             <span className='m-2'>Toilets</span>
                                         </div>
@@ -816,7 +889,7 @@ const UI = observer(() => {
 
                 </div>
                 <div className='canvas'>
-                    <div id="canvas-container" className='border col-12' style={{"backgroundColor": "#ddd"}}>
+                    <div id="canvas-container" className='border col-12' style={{ "backgroundColor": "#ddd" }}>
 
                     </div>
                     <div className='functionBoard' onClick={() => { deleteObject() }}><i className='fa fa-trash'></i></div>
@@ -826,14 +899,22 @@ const UI = observer(() => {
                         <img onClick={e => STORE.view = 0} className={(STORE.view === 0 ? 'active ' : '') + 'btn p-2 bg-light m-3 rounded-1 padding'} src="assets/ui/2d.png" alt="" />
                         <img onClick={e => STORE.view = 1} className={(STORE.view === 1 ? 'active ' : '') + 'btn p-2 bg-light  m-3 rounded-1 padding'} src="assets/ui/3d.png" alt="" />
                         <img className="btn p-2 bg-light  m-3 rounded-1 padding" src="assets/ui/VR.png" alt="" />
-                        <img onClick={e => {STORE.scale += 0.1; console.log(STORE.scale); init()}} className='d-block shadow-focus btn p-2 bg-light  m-3 rounded-1 radius' src="assets/ui/zoomin.svg" alt="" />
+                        <img onClick={e => { STORE.scale += 0.1; console.log(STORE.scale); init() }} className='d-block shadow-focus btn p-2 bg-light  m-3 rounded-1 radius' src="assets/ui/zoomin.svg" alt="" />
                         <img className='d-block shadow-focus btn p-2 bg-light  m-3 rounded-1 radius' src="assets/ui/zoomout.svg" alt="" />
                         <img className='d-block shadow-focus btn p-2 bg-light  m-3 rounded-1 radius' src="assets/ui/zoomout.svg" alt="" />
                         <img className='d-block shadow-focus btn p-2 bg-light  m-3 rounded-1 radius' src="assets/ui/zoomout.svg" alt="" />
                     </div>
                 </div>
+                <div className='modal' style={{display: (show ? "block" : "none")}}>
+                    <div className='create_window'>
+                        <span className='close1' onClick={() => setShow(false)}>&times;</span>
+                        <input type='file' onChange={handleChange} accept="" />
+                        <button onClick={handleUpload}>Upload to Firebase</button>
+                        <p>{percent} "% done"</p>
+                        <img src={imageURL} alt="" />
+                    </div>
+                </div>
             </div>
-
         </div>
     </div >
 });

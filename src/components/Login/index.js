@@ -82,7 +82,7 @@ export default function Login() {
                 </Link>
                 <div className='main_content'>
                     <div className='left_page'>
-                        <img src='./logo2.png' alt="" />
+                        <img src='./logo.png' alt="" />
                         <div className='left_page_cotent'>
                             <h2>Welcome</h2>
                             <p>Login to your account below</p>
@@ -111,7 +111,7 @@ export default function Login() {
                                 <li>Access and action your in-store quotes</li>
                                 <li>See your past purchases</li>
                             </ul>
-                            <a>Register now</a>
+                            <Link to='/register'>Register now</Link>
                         </div>
                     </div>
                 </div>

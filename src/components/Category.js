@@ -2,9 +2,10 @@ import React, {useState, useEffect} from "react";
 import {CategoryContent} from "./CategoryContent";
 
 export function Category(props){
+    const {show, setShow} = props;
     const [isAllCategories, setIsAllCategories] = useState(false);
     const {isAdd, setAdd} = useState(false);
-
+    console.log("-----",show)
     return (
         <div className="d-flex flex-wrap w-100 p-4">
             <div className="d-flex flex-wrap w-100 m-2 b_title">
@@ -19,6 +20,8 @@ export function Category(props){
                     setAdd = {setAdd}
                     loadBathtub = {props.loadBathtub}
                     loadBathtub2 = {props.loadBathtub2}
+                    show={show}
+                    setShow={setShow}
                 />
                  : <div className="d-flex flex-wrap w-100">
                     <div className="d-flex flex-wrap mt-2 w-100 bg-white p-2 rounded shadow-sm">

@@ -27,15 +27,26 @@
 
 .main_content {
     display: flex;
+    flex-direction: row;
+}
+
+@media screen and (max-width: 768px) {
+    .main_content {
+        flex-direction: column;
+    }
 }
 
 .left_page {
     background-color: #ffffff;
     padding: 2% 5%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .right_page {
-    background-color: #003767;
+    background-color: #333;
     color: #ffffff;
     padding: 7% 5%;
     text-align: left;
@@ -46,7 +57,7 @@
 
 .left_page > img {
     width: 100px;
-    height: 100px;
+    height: 50px;
 }
 
 input[type=submit] {
