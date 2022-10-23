@@ -61,6 +61,7 @@ html, body {
   top: 100px;
   align-items: flex-end;
   z-index: 100;
+  right: 15%;
 }
 
 
@@ -257,6 +258,16 @@ h6:hover {
   height: calc(100vh - 240px);
 }
 
+@media screen and (max-width: 768px) {
+  .calc {
+    justify-content: center;
+  }
+
+  .marr {
+    width: 70%;
+  }
+}
+
 .shadow-sm {
   padding-left: 10px;
   padding-right: 10px;
@@ -280,7 +291,7 @@ h6:hover {
   margin: auto;
   padding: 20px;
   border: 1px solid #888;
-  width: 50%;
+  width: 70%;
 }
 
 .close, .close1 {

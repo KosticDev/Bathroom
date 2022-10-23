@@ -978,7 +978,7 @@ const UI = observer(() => {
                     </div>
                     <div className='functionBoard' onClick={() => { deleteObject() }}><i className='fa fa-trash'></i></div>
                 </div>
-                <div className="rightSideBar" style={{ left: window.innerWidth - 150 }}>
+                <div className="rightSideBar">
                     <div>
                         <img onClick={e => STORE.view = 0} className={(STORE.view === 0 ? 'active ' : '') + 'btn p-2 bg-light m-3 rounded-1 padding'} src="assets/ui/2d.png" alt="" />
                         <img onClick={e => STORE.view = 1} className={(STORE.view === 1 ? 'active ' : '') + 'btn p-2 bg-light  m-3 rounded-1 padding'} src="assets/ui/3d.png" alt="" />

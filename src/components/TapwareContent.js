@@ -36,7 +36,7 @@ export function TapwareContent(props) {
                 arrCat.map(arr =>
                     <div className='card d-flex align-items-center text-center p-2 rounded card1 marr'>
                         <span className='m-2'>{arr.title}</span>
-                        <img style={{ width: "70px", scale: "1.5" }} className='m-3 p-2' src={arr.image}></img>
+                        <img style={{ width: "70px", scale: "1" }} className='m-3 p-2' src={arr.image}></img>
                         <div className='btn m-1 rounded-5 shadow-sm' onClick={() => props.loadTapware('assets/doors/tapware.gltf')}>Add to Plan +</div>
                     </div>
                 )
