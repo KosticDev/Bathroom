@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import * as THREE from 'three';
 import './Action'
 
-import $ from 'jquery'
+import $, { data } from 'jquery'
 
 import { MapControls, OrbitControls } from './three/OrbitControls';
 import { DRACOLoader } from './three/DRACOLoader';
@@ -20,9 +20,11 @@ import { render } from '@testing-library/react';
 import Navbar from "./components/Navbar"
 import Sidebar from "./components/Sidebar"
 import { Dimensions } from "./components/dimension";
-import { Category } from './components/Category';
+import { Tapware } from './components/Tapware';
 import storage from './components/Firebase/firebaseConfig';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage'
+import CreateDate from './components/Firebase/Create'
+import { readData } from './components/Firebase/Read';
 
 const Room_types = [1, 2, 3, 4, 5, 6];
 
@@ -109,7 +111,6 @@ var light_2;
 function init() {
     // const orthoCam = new THREE.OrthographicCamera(-frustum, frustum, frustum, -frustum, 0, 30);
     orthoCam.zoom = STORE.Scale * 100;
-    console.log(orthoCam.zoom)
     mapControls = new MapControls(orthoCam, labelRenderer.domElement);
 
     mapControls.zoomSpeed = .1;
@@ -524,10 +525,11 @@ function loadBathtub() {
     );
 }
 
-function loadBathtub2() {
+function loadBathtub2(URL) {
+    console.log(URL, "dsfsadfad---------dsfasd-fadsf-----")
     gltfLoader.load(
         // resource URL
-        'assets/doors/bath2.gltf',
+        URL,
         function (gltf) {
             bathtub2 = gltf.scene;
             bathtub2.scale.x = 0.9;
@@ -569,11 +571,11 @@ function loadBathtub1() {
     );
 }
 
-function loadTapware() {
+function loadTapware(URL) {
 
     gltfLoader.load(
         // resource URL
-        'assets/doors/tapware.gltf',
+        URL,
         function (gltf) {
             tapware = gltf.scene;
             tapware.scale.y = 2;
@@ -603,11 +605,15 @@ const UI = observer(() => {
     const [isCategory, setIsCategory] = useState(false);
     const { isAdd, setAdd } = useState(false);
     const [file, setFile] = useState("");
+    const [file1, setFile1] = useState("");
     const [percent, setPercent] = useState(0);
+    const [percent1, setPercent1] = useState(0);
     const [show, setShow] = useState(false);
     const [imageURL, setImageURL] = useState();
+    const [modelURL, setModelURL] = useState();
+    const [title, setTitle] = useState("");
+    const [categories, setCategories] = useState([]);
 
-    console.log(show,"ui")
     function AssignVal(e) {
 
         STORE[e.target.id] = e.target.value;
@@ -628,6 +634,10 @@ const UI = observer(() => {
 
     function handleChange(event) {
         setFile(event.target.files[0]);
+    }
+
+    function handleChange1(event) {
+        setFile1(event.target.files[0]);
     }
 
     function handleUpload() {
@@ -652,11 +662,66 @@ const UI = observer(() => {
             () => {
                 //download url
                 getDownloadURL(uploadTask.snapshot.ref).then((url) => {
-                    console.log(url);
                     setImageURL(url);
                 });
             }
         );
+    }
+
+    function handleUpload1() {
+        if (!file1) {
+            alert("Please choose a file first!");
+        }
+
+        const storageRef = ref(storage, `/Tapware & Accessories(3D)/${file1.name}`);
+        const uploadTask = uploadBytesResumable(storageRef, file1);
+
+        uploadTask.on(
+            "state_changed",
+            (snapshot) => {
+                const percent = Math.round(
+                    (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+                );
+
+                //update progress
+                setPercent1(percent);
+            },
+            (err) => console.log(err),
+            () => {
+                //download url
+                getDownloadURL(uploadTask.snapshot.ref).then((url) => {
+                    setModelURL(url);
+                });
+            }
+        );
+    }
+
+    function onChangeTitle(e) {
+        setTitle(e.target.value);
+    }
+
+    useEffect(() => {
+        const database = readData();
+        console.log(database)
+        setCategories(database);
+    }, [])
+
+    function saveData() {
+        // const tempCategories = [...categories];
+        // console.log(tempCategories)
+        // tempCategories.push({title, image: imageURL, modelURL});
+        // setCategories(tempCategories);
+        setShow(false);
+        CreateDate(title, imageURL, modelURL)
+            .then(() => {
+                const database = readData();
+                console.log(database)
+                setCategories(database);
+                console.log("Created new item successfully!");
+            })
+            .catch((e) => {
+                console.log(e);
+            })
     }
 
     Update();
@@ -752,32 +817,22 @@ const UI = observer(() => {
                                 <div className='btn m-2 rounded-5 shadow-sm'>Add to Plan +</div>
                             </div>
                             <div className='card m-2 d-flex align-items-center text-center p-2 rounded'>
-                                <span className='m-2'>Door</span>
+                                <span className='m-2'>Internal Wall</span>
                                 <img style={{ width: "80px" }} src="assets/ui/door.svg"></img>
                                 <div className='btn m-2 rounded-5 shadow-sm'>Add to Plan +</div>
                             </div>
                             <div className='card m-2 d-flex align-items-center text-center p-2 rounded'>
-                                <span className='m-2'>Window</span>
+                                <span className='m-2'>Generic Shower<br /> Screen</span>
                                 <img style={{ width: "80px" }} src="assets/ui/window.svg"></img>
                                 <div className='btn m-2 rounded-5 shadow-sm'>Add to Plan +</div>
                             </div>
                             <div className='card m-2 d-flex align-items-center text-center p-2 rounded'>
-                                <span className='m-2'>Door</span>
+                                <span className='m-2'>Obstacle</span>
                                 <img style={{ width: "80px" }} src="assets/ui/door.svg"></img>
                                 <div className='btn m-2 rounded-5 shadow-sm'>Add to Plan +</div>
                             </div>
                             <div className='card m-2 d-flex align-items-center text-center p-2 rounded'>
-                                <span className='m-2'>Window</span>
-                                <img style={{ width: "80px" }} src="assets/ui/window.svg"></img>
-                                <div className='btn m-2 rounded-5 shadow-sm'>Add to Plan +</div>
-                            </div>
-                            <div className='card m-2 d-flex align-items-center text-center p-2 rounded'>
-                                <span className='m-2'>Door</span>
-                                <img style={{ width: "80px" }} src="assets/ui/door.svg"></img>
-                                <div className='btn m-2 rounded-5 shadow-sm'>Add to Plan +</div>
-                            </div>
-                            <div className='card m-2 d-flex align-items-center text-center p-2 rounded'>
-                                <span className='m-2'>Window</span>
+                                <span className='m-2'>Niche</span>
                                 <img style={{ width: "80px" }} src="assets/ui/window.svg"></img>
                                 <div className='btn m-2 rounded-5 shadow-sm'>Add to Plan +</div>
                             </div>
@@ -792,14 +847,15 @@ const UI = observer(() => {
                     <span className='close'>X</span>
                 </div>
                 {
-                    isCategory ? <Category
+                    isCategory ? <Tapware
+                        categories={categories}
                         isAdd={isAdd}
                         setAdd={setAdd}
                         loadBathtub={loadBathtub}
                         loadBathtub2={loadBathtub2}
+                        loadTapware = {loadTapware}
                         show={show}
                         setShow={setShow}
-
                     />
                         : <>
                             <input placeholder='Search all products' type="search" className='d-flex w-100 rounded-4 shadow-sm search' style={{ height: 40, border: "none" }} />
@@ -862,6 +918,33 @@ const UI = observer(() => {
                     <h6 className='trig-btn  py-3 w-100' style={{ color: "#555", marginTop: "0" }}>Styling</h6>
                     <span className='close'>X</span>
                 </div>
+                <h3 style={{ fontSize: "18px", marginLeft: "20px", color: "#555" }}>Select new tile</h3>
+                <div className="d-flex flex-wrap w-100">
+                    <div className="d-flex flex-wrap w-100 cards">
+                        <div className='card  d-flex align-items-center text-center p-2 rounded card1'>
+                            <img src="assets/tiles/tiled1.jpg"></img>
+                            <span className='m-2'>Revival Penny Blu Tile</span>
+                            <span className='m-2'>200x200mm</span>
+                        </div>
+                        <div className='card d-flex align-items-center text-center p-2 rounded card1'>
+                            <img src="assets/tiles/tiled2.png"></img>
+                            <span className='m-2'>Revival Yulan Blanc Tile</span>
+                            <span className='m-2'>200x200mm</span>
+                        </div>
+                    </div>
+                    <div className="d-flex flex-wrap w-100 cards">
+                        <div className='card  d-flex align-items-center text-center p-2 rounded card1'>
+                            <img src="assets/tiles/tiled1.jpg"></img>
+                            <span className='m-2'>Revival Penny Blu Tile</span>
+                            <span className='m-2'>200x200mm</span>
+                        </div>
+                        <div className='card d-flex align-items-center text-center p-2 rounded card1'>
+                            <img src="assets/tiles/tiled2.png"></img>
+                            <span className='m-2'>Revival Yulan Blanc Tile</span>
+                            <span className='m-2'>200x200mm</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div className='roomsSideBar' style={{ marginLeft: (menuOption[4] && !isCategory ? 0 : -400) }} >
@@ -886,7 +969,6 @@ const UI = observer(() => {
             </div>
             <div className="col-12 position-relative p-0 m-0">
                 <div id='measures' style={{ display: STORE.view !== 1 ? '' : 'none' }} className="top-0 start-0 position-absolute w-100 h-100">
-
                 </div>
                 <div className='canvas'>
                     <div id="canvas-container" className='border col-12' style={{ "backgroundColor": "#ddd" }}>
@@ -905,13 +987,26 @@ const UI = observer(() => {
                         <img className='d-block shadow-focus btn p-2 bg-light  m-3 rounded-1 radius' src="assets/ui/zoomout.svg" alt="" />
                     </div>
                 </div>
-                <div className='modal' style={{display: (show ? "block" : "none")}}>
+                <div className='modal' style={{ display: (show ? "block" : "none") }}>
                     <div className='create_window'>
                         <span className='close1' onClick={() => setShow(false)}>&times;</span>
+                        <label><small>image file: </small></label>
                         <input type='file' onChange={handleChange} accept="" />
                         <button onClick={handleUpload}>Upload to Firebase</button>
-                        <p>{percent} "% done"</p>
-                        <img src={imageURL} alt="" />
+                        <p>{percent} % done</p>
+                        <label><small>3D model file: </small></label>
+                        <input type='file' onChange={handleChange1} accept="" />
+                        <button onClick={handleUpload1}>Upload to Firebase</button>
+                        <p>{percent1} % done</p>
+                        <div className='image_info'>
+                            <label>Title:&nbsp;
+                                <input type='text' value={title} onChange={onChangeTitle} />
+                            </label>
+                            <img className='uploadimage' src={imageURL} alt="" />
+                            <button className='submit_button' onClick={saveData}>
+                                Save
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

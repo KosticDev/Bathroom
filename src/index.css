@@ -106,6 +106,7 @@ input[type="search"] {
   height: 5px;
   line-height: normal;
 }
+
 .cards {
   display: flex;
   justify-content: space-between;
@@ -212,6 +213,11 @@ h6:hover {
   background-image: linear-gradient(#aaa, #fff);
 }
 
+.marr {
+  margin-bottom: 10px;
+  margin-left: 5px;
+}
+
 .radius {
   border-radius: 50% !important;
   background-image: linear-gradient(#aaa, #fff);
@@ -288,4 +294,30 @@ h6:hover {
   color: #000;
   text-decoration: none;
   cursor: pointer;
+}
+
+.uploadimage {
+  width: 200px;
+  height: auto;
+}
+
+.image_info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 2px solid #aaa;
+  gap: 30px;
+  width: 50%;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 20px;
+}
+
+.image_info > label {
+  font-size: 14px !important;
+  font-weight: 500;
+}
+
+.image_info > label > input {
+  width: 100px !important;
 }
