@@ -856,6 +856,8 @@ const UI = observer(() => {
                         loadTapware = {loadTapware}
                         show={show}
                         setShow={setShow}
+                        isCategory={isCategory}
+                        setIsCategory={setIsCategory}
                     />
                         : <>
                             <input placeholder='Search all products' type="search" className='d-flex w-100 rounded-4 shadow-sm search' style={{ height: 40, border: "none" }} />

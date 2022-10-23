@@ -82,7 +82,7 @@ export default function Login() {
                 </Link>
                 <div className='main_content'>
                     <div className='left_page'>
-                        <img src='./logo.png' alt="" />
+                        <img src='./logo3.png' alt="" />
                         <div className='left_page_cotent'>
                             <h2>Welcome</h2>
                             <p>Login to your account below</p>
@@ -91,24 +91,23 @@ export default function Login() {
                     </div>
                     <div className='right_page'>
                         <div className='first_title'>
-                            <h1>Not signed up?</h1>
-                            <p>Applying for online access is easy.</p>
+                            <h1>Have you signed up?</h1>
+                            <p>Applying for easy online access and save your bathroom design.</p>
                         </div>
                         <div className='second_title'>
                             <h3>Trade Account</h3>
-                            <p>maX - Your online business management system</p>
+                            {/* <p>maX - Your online business management system</p>
                             <ul>
                                 <li>Apply for a cash or credit account for your business</li>
                                 <li>Create a maX login and connect it to an existing maX trade account</li>
-                            </ul>
+                            </ul> */}
                             <a>Apply now</a>
                         </div>
                         <div className='three_title'>
                             <h3>Personal Account</h3>
                             <p>For non-trade customers</p>
                             <ul>
-                                <li>Save your moodboards and 3D plans</li>
-                                <li>Access and action your in-store quotes</li>
+                                <li>Save and get a quote on your design.</li>
                                 <li>See your past purchases</li>
                             </ul>
                             <Link to='/register'>Register now</Link>

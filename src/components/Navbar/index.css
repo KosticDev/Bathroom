@@ -9,4 +9,11 @@
 
 .b_login {
     cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.b_login > a {
+    text-decoration: none;
+
 }

@@ -147,6 +147,13 @@ input[type="search"] {
   margin-bottom: 0 !important;
   padding-left: 0px;
   margin-left: 0 !important;
+  cursor: pointer;
+}
+
+.b_title > span, .b_title > p {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0 !important;
 }
 
 .r_title {
