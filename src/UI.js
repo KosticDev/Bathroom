@@ -235,7 +235,7 @@ function resize() {
 window.addEventListener('resize', resize, false);
 
 GenerateBathroom();
-loadDoor();
+loadDoor('assets/doors/panel.glb', 1, 1);
 loadBathtub1();
 animate();
 
@@ -458,20 +458,23 @@ function GenerateMeasurements() {
 
 }
 
-function loadDoor() {
+function loadDoor(url, num, num1) {
     gltfLoader.load(
         // resource URL
-        'assets/doors/panel.glb',
+        url,
         // called when the resource is loaded
         function (gltf) {
             InvisibleMat = new THREE.MeshBasicMaterial({ color: 'red', visible: false, transparent: true, opacity: .3 });
-            temp_door = new THREE.Mesh(new THREE.BoxGeometry(wallItems.door.width, wallItems.door.height, wallItems.door.depth), InvisibleMat);
+            temp_door = new THREE.Mesh(new THREE.BoxGeometry(wallItems.door.width / num1, wallItems.door.height / num1, wallItems.door.depth / num1), InvisibleMat);
             temp_door.geometry.translate(0, wallItems.door.height * .5, 0);
             temp_door.position.set(0, 0, -STORE.Length / 2 - 0.02);
             temp_door.userData.normalAxis = AXIS.Z;
             temp_door.userData.normalVector = new Vector3(0, 0, 1);
             temp_door.userData.dir = DIR.START;
             door = gltf.scene;
+            door.scale.x = num;
+            door.scale.y = num;
+            door.scale.z = num;
             temp_door.add(door);
             scene.add(temp_door);
             objects.push(temp_door);
@@ -809,32 +812,17 @@ const UI = observer(() => {
                             <div className='card m-2 d-flex align-items-center text-center p-2 rounded'>
                                 <span className='m-2'>Door</span>
                                 <img style={{ width: "80px" }} src="assets/ui/door.svg"></img>
-                                <div className='btn m-2 rounded-5 shadow-sm'>Add to Plan +</div>
+                                <div className='btn m-2 rounded-5 shadow-sm' onClick={() => loadDoor('assets/doors/panel.glb', 1, 1)}>Add to Plan +</div>
                             </div>
                             <div className='card m-2 d-flex align-items-center text-center p-2 rounded'>
-                                <span className='m-2'>Window</span>
-                                <img style={{ width: "80px" }} src="assets/ui/window.svg"></img>
-                                <div className='btn m-2 rounded-5 shadow-sm'>Add to Plan +</div>
+                                <span className='m-2'>Sliding window</span>
+                                <img style={{ width: "80px" }} src="assets/ui/Sliding window.png"></img>
+                                <div className='btn m-2 rounded-5 shadow-sm' onClick={() => loadDoor('assets/doors/sliding.glb', 0.03, 1)}>Add to Plan +</div>
                             </div>
                             <div className='card m-2 d-flex align-items-center text-center p-2 rounded'>
-                                <span className='m-2'>Internal Wall</span>
-                                <img style={{ width: "80px" }} src="assets/ui/door.svg"></img>
-                                <div className='btn m-2 rounded-5 shadow-sm'>Add to Plan +</div>
-                            </div>
-                            <div className='card m-2 d-flex align-items-center text-center p-2 rounded'>
-                                <span className='m-2'>Generic Shower<br /> Screen</span>
-                                <img style={{ width: "80px" }} src="assets/ui/window.svg"></img>
-                                <div className='btn m-2 rounded-5 shadow-sm'>Add to Plan +</div>
-                            </div>
-                            <div className='card m-2 d-flex align-items-center text-center p-2 rounded'>
-                                <span className='m-2'>Obstacle</span>
-                                <img style={{ width: "80px" }} src="assets/ui/door.svg"></img>
-                                <div className='btn m-2 rounded-5 shadow-sm'>Add to Plan +</div>
-                            </div>
-                            <div className='card m-2 d-flex align-items-center text-center p-2 rounded'>
-                                <span className='m-2'>Niche</span>
-                                <img style={{ width: "80px" }} src="assets/ui/window.svg"></img>
-                                <div className='btn m-2 rounded-5 shadow-sm'>Add to Plan +</div>
+                                <span className='m-2'>Traditional door</span>
+                                <img style={{ width: "80px" }} src="assets/ui/Traditional door.png"></img>
+                                <div className='btn m-2 rounded-5 shadow-sm' onClick={() => loadDoor('assets/doors/Traditional door.gltf', 1, 1)}>Add to Plan +</div>
                             </div>
                         </div>
                     </div>
@@ -978,7 +966,7 @@ const UI = observer(() => {
                     </div>
                     <div className='functionBoard' onClick={() => { deleteObject() }}><i className='fa fa-trash'></i></div>
                 </div>
-                <div className="rightSideBar">
+                <div className="rightSideBar" style={{ left: window.innerWidth - 150 }}>
                     <div>
                         <img onClick={e => STORE.view = 0} className={(STORE.view === 0 ? 'active ' : '') + 'btn p-2 bg-light m-3 rounded-1 padding'} src="assets/ui/2d.png" alt="" />
                         <img onClick={e => STORE.view = 1} className={(STORE.view === 1 ? 'active ' : '') + 'btn p-2 bg-light  m-3 rounded-1 padding'} src="assets/ui/3d.png" alt="" />

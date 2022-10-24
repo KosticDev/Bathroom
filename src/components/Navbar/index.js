@@ -9,7 +9,7 @@ const Navbar = () => {
                 <img src="logo1.png" height={'100%'} alt="" />
             </div>
             <div className="b_login">
-                <Link to='login'>SignIn/SingUp</Link>
+                <Link to='login'>Login/Register</Link>
             </div>
         </div>
     </div>

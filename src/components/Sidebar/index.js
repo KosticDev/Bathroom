@@ -33,40 +33,40 @@ const Sidebar = ({ menuOption, setMenuOption, setIsCategory }) => {
                     <img className="p-2 ms-2" src="assets/ui/dashes.svg"></img>
                 </div>
                 <div onClick={() => handleMenu(0)} className='trig-btn w-100'>
-                    <img className="p-2 ms-2" src="assets/ui/roomlayout.svg"></img>
+                    <img className="p-2" src="assets/ui/layout.png" style={{ width: "60px"}}></img>
                     <div className="ml-2" style={{ display: (isOpen ? "" : "none"), color: "black" }} >Room Layout
                     </div>
                 </div>
                 <div onClick={() => handleMenu(1)} className='trig-btn w-100'>
-                    <img className="p-2 ms-2" src="assets/ui/roomelements.svg"></img>
+                    <img className="p-2" src="assets/ui/element.jfif" style={{ width: "60px"}}></img>
                     <div className="ml-2" style={{ display: (isOpen ? "" : "none"), color: "black" }} >Bathroom Elements
                     </div>
                 </div>
                 <div onClick={() => handleMenu(2)} className='trig-btn w-100'>
-                    <img className="p-2 ms-2" src="assets/ui/bathroomproducts.svg"></img>
+                    <img className="p-2" src="assets/ui/bathroom.png" style={{ width: "60px"}}></img>
                     <div className="ml-2" style={{ display: (isOpen ? "" : "none"), color: "black" }} >Bathroom Products
                     </div>
                 </div>
                 <div onClick={() => handleMenu(3)} className='trig-btn w-100'>
-                    <img className="p-2 ms-2" src="assets/ui/styling.svg"></img>
+                    <img className="p-2" src="assets/ui/style.png" style={{ width: "60px"}}></img>
                     <div className="ml-2" style={{ display: (isOpen ? "" : "none"), color: "black" }} > Styling
                     </div>
                 </div>
                 <div onClick={() => handleMenu(4)} className='trig-btn w-100'>
-                    <img className="p-2 ms-2" src="assets/ui/productsummary.svg"></img>
+                    <img className="p-2" src="assets/ui/product.png" style={{ width: "60px"}}></img>
                     <div className="ml-2" style={{ display: (isOpen ? "" : "none"), color: "black" }} > Product Summary
                     </div>
                 </div>
             </div>
             <div>
                 <div onClick={() => handleMenu(5)} className='trig-btn w-100'>
-                    <img className="p-2 ms-2" src="assets/ui/bookconsultation.svg"></img>
+                    <img className="p-2" src="assets/ui/calendar.png" style={{ width: "60px"}}></img>
                     <div className="ml-2" style={{ display: (isOpen ? "" : "none"), color: "black" }} > Book a consultation
                     </div>
                 </div>
                 <div onClick={() => handleMenu(6)} className='trig-btn w-100'>
-                    <img className="p-2 ms-2" src="assets/ui/exitplan.svg"></img>
-                    <div className="ml-2" style={{ display: (isOpen ? "" : "none"), color: "black" }} > Exit Plan
+                    <img className="p-2" src="assets/ui/Download.png" style={{ width: "60px"}}></img>
+                    <div className="ml-2" style={{ display: (isOpen ? "" : "none"), color: "black" }} > Save
                     </div>
                 </div>
             </div>
