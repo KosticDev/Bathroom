@@ -38,7 +38,7 @@ const Sidebar = ({ menuOption, setMenuOption, setIsCategory }) => {
                     </div>
                 </div>
                 <div onClick={() => handleMenu(1)} className='trig-btn w-100'>
-                    <img className="p-2" src="assets/ui/element.jfif" style={{ width: "60px"}}></img>
+                    <img className="p-2" src="assets/ui/element.png" style={{ width: "60px"}}></img>
                     <div className="ml-2" style={{ display: (isOpen ? "" : "none"), color: "black" }} >Bathroom Elements
                     </div>
                 </div>

@@ -234,6 +234,12 @@ h6:hover {
   background-image: linear-gradient(#aaa, #fff);
 }
 
+.radius1 {
+  padding: 2px !important;
+  border-radius: 50% !important;
+  background-image: linear-gradient(#aaa, #fff);
+}
+
 .shadow {
   padding: 3px !important;
   margin: 2px !important;
