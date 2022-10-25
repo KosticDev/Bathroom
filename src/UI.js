@@ -175,16 +175,6 @@ function DragObject(vec3, object, selectedwall) {
         case AXIS.Y:
             object.position.x = vec3.x;
             object.position.z = vec3.z;
-            object.position.y = vec3.y;
-            // object.userData.normalAxis = AXIS.Y;
-            // if (selectedwall.userData.dir == DIR.START) {
-            //     object.rotation.z = 0;
-            //     object.userData.dir = DIR.START;
-            // }
-            // else {
-            //     object.rotation.z = -Math.PI;
-            //     object.userData.dir = DIR.END;
-            // }
             break;
         default:
             break;
@@ -631,6 +621,7 @@ const UI = observer(() => {
     const [modelURL, setModelURL] = useState();
     const [title, setTitle] = useState("");
     const [categories, setCategories] = useState([]);
+    const [header, setHeader] = useState('Bath & Spas')
 
     function AssignVal(e) {
 
@@ -866,6 +857,7 @@ const UI = observer(() => {
                         setShow={setShow}
                         isCategory={isCategory}
                         setIsCategory={setIsCategory}
+                        header={header}
                     />
                         : <>
                             <input placeholder='Search all products' type="search" className='d-flex w-100 rounded-4 shadow-sm search' style={{ height: 40, border: "none" }} />
@@ -876,7 +868,7 @@ const UI = observer(() => {
                                             <img src="assets/ui/e09acac1-fc05-4078-bd84-73b765c26c31.png"></img>
                                             <span className='m-2'>Baths & Spas</span>
                                         </div>
-                                        <div className='card d-flex align-items-center text-center p-2 rounded card1'>
+                                        <div className='card d-flex align-items-center text-center p-2 rounded card1'  onClick={() => {setIsCategory(true)}}>
                                             <img src="assets/ui/Vanities.png"></img>
                                             <span className='m-2'>Vanities</span>
                                         </div>
@@ -884,11 +876,11 @@ const UI = observer(() => {
                                 </div>
                                 <div className="d-flex flex-wrap w-100">
                                     <div className="d-flex flex-wrap w-100 cards">
-                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1'>
+                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1'  onClick={() => setIsCategory(true)}>
                                             <img src="assets/ui/Shavers and Mirrors.png"></img>
                                             <span className='m-2'>Shavers & Mirrors</span>
                                         </div>
-                                        <div className='card d-flex align-items-center text-center p-2 rounded card1'>
+                                        <div className='card d-flex align-items-center text-center p-2 rounded card1'  onClick={() => setIsCategory(true)}>
                                             <img src="assets/ui/Basins.png"></img>
                                             <span className='m-2'>Basins</span>
                                         </div>
@@ -896,11 +888,11 @@ const UI = observer(() => {
                                 </div>
                                 <div className="d-flex flex-wrap w-100">
                                     <div className="d-flex flex-wrap w-100 cards">
-                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1' onClick={() => Shower()}>
+                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1'  onClick={() => setIsCategory(true)}>
                                             <img src="assets/ui/Showers.png"></img>
                                             <span className='m-2'>Showers</span>
                                         </div>
-                                        <div className='card d-flex align-items-center text-center p-2 rounded card1' onClick={() => loadTapware()}>
+                                        <div className='card d-flex align-items-center text-center p-2 rounded card1'  onClick={() => setIsCategory(true)}>
                                             <img src="assets/ui/Tapware & Accessories.png"></img>
                                             <span className='m-2'>Tapware & Accessories</span>
                                         </div>
@@ -908,11 +900,11 @@ const UI = observer(() => {
                                 </div>
                                 <div className="d-flex flex-wrap w-100">
                                     <div className="d-flex flex-wrap w-100 cards">
-                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1'>
+                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1'  onClick={() => setIsCategory(true)}>
                                             <img src="assets/ui/Toilets.png"></img>
                                             <span className='m-2'>Toilets</span>
                                         </div>
-                                        <div className='card d-flex align-items-center text-center p-2 rounded card1'>
+                                        <div className='card d-flex align-items-center text-center p-2 rounded card1'  onClick={() => setIsCategory(true)}>
                                             <img src="assets/ui/Wastes & Plumbing.png"></img>
                                             <span className='m-2'>Wastes & Plumbing</span>
                                         </div>
