@@ -359,6 +359,12 @@ const onmousemove = (e) => {
     mapControls.enabled = false;
 }
 
+$('body').keydown(function(event){
+    var letter = String.fromCharCode(event.which);
+    if(event.keyCode == 46){
+        deleteObject();
+    }
+})
 
 function deleteObject() {
     console.log("here")
@@ -483,7 +489,7 @@ function loadDoor(url, num, num1) {
             door = gltf.scene;
             door.scale.x = num;
             door.scale.y = num;
-            door.scale.z = num;
+            door.scale.z = num / 2;
             temp_door.add(door);
             scene.add(temp_door);
             objects.push(temp_door);
@@ -818,19 +824,24 @@ const UI = observer(() => {
                     <h6 className='trig-btn  w-100' style={{ color: "#555", paddingLeft: "20px", height: "30px" }}> Add Room Elements</h6>
                     <div className="height_vh">
                         <div className="d-flex flex-wrap w-100 justify">
-                            <div className='card m-2 d-flex align-items-center text-center p-2 rounded'>
+                            <div className='card m-2 d-flex align-items-center text-center p-2 rounded' style={{ width: "45%" }}>
                                 <span className='m-2'>Door</span>
-                                <img style={{ width: "80px" }} src="assets/ui/door.svg"></img>
+                                <img style={{ width: "80px", height: "80px" }} src="assets/ui/door.svg"></img>
                                 <div className='btn m-2 rounded-5 shadow-sm' onClick={() => loadDoor('assets/doors/panel.glb', 1, 1)}>Add to Plan +</div>
                             </div>
-                            <div className='card m-2 d-flex align-items-center text-center p-2 rounded'>
+                            <div className='card m-2 d-flex align-items-center text-center p-2 rounded' style={{ width: "45%" }}>
                                 <span className='m-2'>Sliding window</span>
-                                <img style={{ width: "80px" }} src="assets/ui/Sliding window.png"></img>
+                                <img style={{ width: "80px", height: "80px" }} src="assets/ui/Sliding window.png"></img>
                                 <div className='btn m-2 rounded-5 shadow-sm' onClick={() => loadDoor('assets/doors/sliding.glb', 0.03, 0.9)}>Add to Plan +</div>
                             </div>
-                            <div className='card m-2 d-flex align-items-center text-center p-2 rounded'>
+                            <div className='card m-2 d-flex align-items-center text-center p-2 rounded' style={{ width: "45%" }}>
                                 <span className='m-2'>Traditional door</span>
-                                <img style={{ width: "80px" }} src="assets/ui/Traditional door.png"></img>
+                                <img style={{ width: "80px", height: "80px" }} src="assets/ui/Traditional door.png"></img>
+                                <div className='btn m-2 rounded-5 shadow-sm' onClick={() => loadDoor('assets/doors/Traditional door.gltf', 1, 0.5)}>Add to Plan +</div>
+                            </div>
+                            <div className='card m-2 d-flex align-items-center text-center p-2 rounded' style={{ width: "45%" }}>
+                                <span className='m-2'>Traditional door</span>
+                                <img style={{ width: "80px", height: "80px" }} src="assets/ui/Traditional door.png"></img>
                                 <div className='btn m-2 rounded-5 shadow-sm' onClick={() => loadDoor('assets/doors/Traditional door.gltf', 1, 0.5)}>Add to Plan +</div>
                             </div>
                         </div>
@@ -850,7 +861,7 @@ const UI = observer(() => {
                         setAdd={setAdd}
                         loadBathtub={loadBathtub}
                         loadBathtub2={loadBathtub2}
-                        loadTapware = {loadTapware}
+                        loadTapware={loadTapware}
                         show={show}
                         setShow={setShow}
                         isCategory={isCategory}
@@ -917,30 +928,36 @@ const UI = observer(() => {
                     <h6 className='trig-btn  py-3 w-100' style={{ color: "#555", marginTop: "0" }}>Styling</h6>
                     <span className='close'>X</span>
                 </div>
-                <h3 style={{ fontSize: "18px", marginLeft: "20px", color: "#555" }}>Select new tile</h3>
                 <div className="d-flex flex-wrap w-100">
-                    <div className="d-flex flex-wrap w-100 cards">
-                        <div className='card  d-flex align-items-center text-center p-2 rounded card1'>
-                            <img src="assets/tiles/tiled1.jpg"></img>
-                            <span className='m-2'>Revival Penny Blu Tile</span>
-                            <span className='m-2'>200x200mm</span>
-                        </div>
-                        <div className='card d-flex align-items-center text-center p-2 rounded card1'>
-                            <img src="assets/tiles/tiled2.png"></img>
-                            <span className='m-2'>Revival Yulan Blanc Tile</span>
-                            <span className='m-2'>200x200mm</span>
-                        </div>
-                    </div>
-                    <div className="d-flex flex-wrap w-100 cards">
-                        <div className='card  d-flex align-items-center text-center p-2 rounded card1'>
-                            <img src="assets/tiles/tiled1.jpg"></img>
-                            <span className='m-2'>Revival Penny Blu Tile</span>
-                            <span className='m-2'>200x200mm</span>
-                        </div>
-                        <div className='card d-flex align-items-center text-center p-2 rounded card1'>
-                            <img src="assets/tiles/tiled2.png"></img>
-                            <span className='m-2'>Revival Yulan Blanc Tile</span>
-                            <span className='m-2'>200x200mm</span>
+                    <h6 className='trig-btn  w-100' style={{ color: "#555", paddingLeft: "20px", height: "30px" }}> Select New Tile</h6>
+                    <div className="height_vh">
+                        <div className="d-flex flex-wrap w-100 justify">
+                            <div className='card m-2 p-4 d-flex align-items-center text-left p-2 rounded' style={{ width: "45%" }}>
+                                <img style={{ width: "100px", height: "100px" }} src="assets/tiles/tiled1.jpg"></img>
+                                <span className='m-2' style={{ fontSize: "12px"}}>Revival Penny Blu Title</span>
+                                <span className='m-2' style={{ fontSize: "12px"}}>200x200mm</span>
+                                <div className='hover1'><p>+</p></div>
+                            </div>
+                            <div className='card m-2 p-4 d-flex align-items-center text-left p-2 rounded' style={{ width: "45%" }}>
+                                <img style={{ width: "100px", height: "100px" }} src="assets/tiles/tiled2.png"></img>
+                                <span className='m-2' style={{ fontSize: "12px"}}>Revival Penny Blu Title</span>
+                                <span className='m-2' style={{ fontSize: "12px"}}>200x200mm</span>
+                            </div>
+                            <div className='card m-2 p-4 d-flex align-items-center text-left p-2 rounded' style={{ width: "45%" }}>
+                                <img style={{ width: "100px", height: "100px" }} src="assets/tiles/tiled3.png"></img>
+                                <span className='m-2' style={{ fontSize: "12px"}}>Revival Penny Blu Title</span>
+                                <span className='m-2' style={{ fontSize: "12px"}}>200x200mm</span>
+                            </div>
+                            <div className='card m-2 p-4 d-flex align-items-center text-left p-2 rounded' style={{ width: "45%" }}>
+                                <img style={{ width: "100px", height: "100px" }} src="assets/tiles/tiled2.png"></img>
+                                <span className='m-2' style={{ fontSize: "12px"}}>Revival Penny Blu Title</span>
+                                <span className='m-2' style={{ fontSize: "12px"}}>200x200mm</span>
+                            </div>
+                            <div className='card m-2 p-4 d-flex align-items-center text-left p-2 rounded' style={{ width: "45%" }}>
+                                <img style={{ width: "100px", height: "100px" }} src="assets/tiles/tiled1.jpg"></img>
+                                <span className='m-2' style={{ fontSize: "12px"}}>Revival Penny Blu Title</span>
+                                <span className='m-2' style={{ fontSize: "12px"}}>200x200mm</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -982,8 +999,8 @@ const UI = observer(() => {
                         <img className="btn p-2 bg-light  m-3 rounded-1 padding" src="assets/ui/VR.png" alt="" />
                         <img onClick={e => { STORE.scale += 0.1; console.log(STORE.scale); init() }} className='d-block shadow-focus btn p-2 bg-light  m-3 rounded-1 radius' src="assets/ui/zoomin.svg" alt="" />
                         <img className='d-block shadow-focus btn p-2 bg-light  m-3 rounded-1 radius' src="assets/ui/zoomout.svg" alt="" />
-                        <img className='d-block shadow-focus btn p-2 bg-light  m-3 rounded-1 radius1' src="assets/ui/back.png" style={{ width: "37px"}} alt="" />
-                        <img className='d-block shadow-focus btn p-2 bg-light  m-3 rounded-1 radius1' src="assets/ui/forward.png" style={{ width: "37px"}} alt="" />
+                        <img className='d-block shadow-focus btn p-2 bg-light  m-3 rounded-1 radius1' src="assets/ui/back.png" style={{ width: "37px" }} alt="" />
+                        <img className='d-block shadow-focus btn p-2 bg-light  m-3 rounded-1 radius1' src="assets/ui/forward.png" style={{ width: "37px" }} alt="" />
                     </div>
                 </div>
                 <div className='modal' style={{ display: (show ? "block" : "none") }}>

@@ -351,3 +351,22 @@ h6:hover {
 .image_info>label>input {
   width: 100px !important;
 }
+
+.rounded {
+  position: relative;
+}
+
+.hover1 {
+  position: absolute;
+  top: 10%;
+  padding:5px;
+  background-color: #333;
+  border-radius: 50%;
+}
+
+.hover1 > p {
+  color: #fff;
+  font-weight: bold;
+  font-size: 20px;
+  margin-bottom: 0;
+}
