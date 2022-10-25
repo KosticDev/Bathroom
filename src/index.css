@@ -90,7 +90,7 @@ body {
 
 .height_vh {
   overflow-y: scroll;
-  height: calc(100vh - 200px);
+  max-height: calc(100vh - 200px);
 }
 
 .mb-3 {
@@ -212,7 +212,7 @@ h6:hover {
 
 .main_window {
   margin-top: 15px;
-  height: calc(100vh - 200px);
+  max-height: calc(100vh - 200px);
   overflow-y: scroll;
 }
 
@@ -264,7 +264,7 @@ h6:hover {
 
 .calc {
   overflow-y: scroll;
-  height: calc(100vh - 240px);
+  max-height: calc(100vh - 240px);
 }
 
 @media screen and (max-width: 768px) {

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 export function TapwareContent(props) {
 
-    const { show, setShow, categories, header } = props;
+    const { show, setShow, categories } = props;
     const [create, setCreate] = useState(false);
     const [arrCat, setArrCat] = useState([]);
 
@@ -23,7 +23,7 @@ export function TapwareContent(props) {
     return (
         <div className="d-flex flex-wrap w-100 calc">
             <div className='card d-flex align-items-center text-center p-2 rounded card1 marr'>
-                <span className='m-2'>{header}</span>
+                <span className='m-2'>Bath & Spas</span>
                 <img style={{ width: "70px", scale: "1.2" }} className='m-3 p-2' src="assets/ui/e09acac1-fc05-4078-bd84-73b765c26c31.png"></img>
                 <div className='btn m-1 rounded-5 shadow-sm' onClick={() => props.loadBathtub()}>Add to Plan +</div>
             </div>
