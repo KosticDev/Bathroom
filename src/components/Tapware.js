@@ -22,6 +22,7 @@ export function Tapware(props) {
                     loadBathtub={props.loadBathtub}
                     loadBathtub2={props.loadBathtub2}
                     loadTapware={props.loadTapware}
+                    shower={props.shower}
                     show={show}
                     setShow={setShow}
                 />

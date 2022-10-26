@@ -96,11 +96,6 @@ export default function Login() {
                         </div>
                         <div className='second_title'>
                             <h3>Trade Account</h3>
-                            {/* <p>maX - Your online business management system</p>
-                            <ul>
-                                <li>Apply for a cash or credit account for your business</li>
-                                <li>Create a maX login and connect it to an existing maX trade account</li>
-                            </ul> */}
                             <a>Apply now</a>
                         </div>
                         <div className='three_title'>

@@ -52,6 +52,8 @@ let updateTimeout;
 
 const gltfLoader = new GLTFLoader();
 
+
+
 let selectedItem = null;
 let hoverItem;
 
@@ -349,9 +351,9 @@ const onmousemove = (e) => {
     mapControls.enabled = false;
 }
 
-$('body').keydown(function(event){
+$('body').keydown(function (event) {
     var letter = String.fromCharCode(event.which);
-    if(event.keyCode == 46){
+    if (event.keyCode == 46) {
         deleteObject();
     }
 })
@@ -595,7 +597,7 @@ function loadTapware(URL) {
             temp_tapware.geometry.translate(0, wallItems.tapware.height * .01, 0);
             temp_tapware.position.set(1, 0.12, 1);
             temp_tapware.userData.normalAxis = AXIS.Y;
-            tapware.children[0].material.visible = true;
+            // tapware.children[0].material.visible = true;
             temp_tapware.add(tapware);
             scene.add(temp_tapware);
             objects.push(temp_tapware);
@@ -858,6 +860,7 @@ const UI = observer(() => {
                         isCategory={isCategory}
                         setIsCategory={setIsCategory}
                         header={header}
+                        shower={Shower}
                     />
                         : <>
                             <input placeholder='Search all products' type="search" className='d-flex w-100 rounded-4 shadow-sm search' style={{ height: 40, border: "none" }} />
@@ -868,7 +871,7 @@ const UI = observer(() => {
                                             <img src="assets/ui/e09acac1-fc05-4078-bd84-73b765c26c31.png"></img>
                                             <span className='m-2'>Baths & Spas</span>
                                         </div>
-                                        <div className='card d-flex align-items-center text-center p-2 rounded card1'  onClick={() => {setIsCategory(true)}}>
+                                        <div className='card d-flex align-items-center text-center p-2 rounded card1' onClick={() => { setIsCategory(true) }}>
                                             <img src="assets/ui/Vanities.png"></img>
                                             <span className='m-2'>Vanities</span>
                                         </div>
@@ -876,11 +879,11 @@ const UI = observer(() => {
                                 </div>
                                 <div className="d-flex flex-wrap w-100">
                                     <div className="d-flex flex-wrap w-100 cards">
-                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1'  onClick={() => setIsCategory(true)}>
+                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1' onClick={() => setIsCategory(true)}>
                                             <img src="assets/ui/Shavers and Mirrors.png"></img>
                                             <span className='m-2'>Shavers & Mirrors</span>
                                         </div>
-                                        <div className='card d-flex align-items-center text-center p-2 rounded card1'  onClick={() => setIsCategory(true)}>
+                                        <div className='card d-flex align-items-center text-center p-2 rounded card1' onClick={() => setIsCategory(true)}>
                                             <img src="assets/ui/Basins.png"></img>
                                             <span className='m-2'>Basins</span>
                                         </div>
@@ -888,11 +891,11 @@ const UI = observer(() => {
                                 </div>
                                 <div className="d-flex flex-wrap w-100">
                                     <div className="d-flex flex-wrap w-100 cards">
-                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1'  onClick={() => setIsCategory(true)}>
+                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1' onClick={() => setIsCategory(true)}>
                                             <img src="assets/ui/Showers.png"></img>
                                             <span className='m-2'>Showers</span>
                                         </div>
-                                        <div className='card d-flex align-items-center text-center p-2 rounded card1'  onClick={() => setIsCategory(true)}>
+                                        <div className='card d-flex align-items-center text-center p-2 rounded card1' onClick={() => setIsCategory(true)}>
                                             <img src="assets/ui/Tapware & Accessories.png"></img>
                                             <span className='m-2'>Tapware & Accessories</span>
                                         </div>
@@ -900,11 +903,11 @@ const UI = observer(() => {
                                 </div>
                                 <div className="d-flex flex-wrap w-100">
                                     <div className="d-flex flex-wrap w-100 cards">
-                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1'  onClick={() => setIsCategory(true)}>
+                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1' onClick={() => setIsCategory(true)}>
                                             <img src="assets/ui/Toilets.png"></img>
                                             <span className='m-2'>Toilets</span>
                                         </div>
-                                        <div className='card d-flex align-items-center text-center p-2 rounded card1'  onClick={() => setIsCategory(true)}>
+                                        <div className='card d-flex align-items-center text-center p-2 rounded card1' onClick={() => setIsCategory(true)}>
                                             <img src="assets/ui/Wastes & Plumbing.png"></img>
                                             <span className='m-2'>Wastes & Plumbing</span>
                                         </div>
@@ -926,29 +929,29 @@ const UI = observer(() => {
                         <div className="d-flex flex-wrap w-100 justify">
                             <div className='card m-2 p-4 d-flex align-items-center text-left p-2 rounded' style={{ width: "45%" }}>
                                 <img style={{ width: "100px", height: "100px" }} src="assets/tiles/tiled1.jpg"></img>
-                                <span className='m-2' style={{ fontSize: "12px"}}>Revival Penny Blu Title</span>
-                                <span className='m-2' style={{ fontSize: "12px"}}>200x200mm</span>
+                                <span className='m-2' style={{ fontSize: "12px" }}>Revival Penny Blu Title</span>
+                                <span className='m-2' style={{ fontSize: "12px" }}>200x200mm</span>
                                 <div className='hover1'><p>+</p></div>
                             </div>
                             <div className='card m-2 p-4 d-flex align-items-center text-left p-2 rounded' style={{ width: "45%" }}>
                                 <img style={{ width: "100px", height: "100px" }} src="assets/tiles/tiled2.png"></img>
-                                <span className='m-2' style={{ fontSize: "12px"}}>Revival Penny Blu Title</span>
-                                <span className='m-2' style={{ fontSize: "12px"}}>200x200mm</span>
+                                <span className='m-2' style={{ fontSize: "12px" }}>Revival Penny Blu Title</span>
+                                <span className='m-2' style={{ fontSize: "12px" }}>200x200mm</span>
                             </div>
                             <div className='card m-2 p-4 d-flex align-items-center text-left p-2 rounded' style={{ width: "45%" }}>
                                 <img style={{ width: "100px", height: "100px" }} src="assets/tiles/tiled3.png"></img>
-                                <span className='m-2' style={{ fontSize: "12px"}}>Revival Penny Blu Title</span>
-                                <span className='m-2' style={{ fontSize: "12px"}}>200x200mm</span>
+                                <span className='m-2' style={{ fontSize: "12px" }}>Revival Penny Blu Title</span>
+                                <span className='m-2' style={{ fontSize: "12px" }}>200x200mm</span>
                             </div>
                             <div className='card m-2 p-4 d-flex align-items-center text-left p-2 rounded' style={{ width: "45%" }}>
                                 <img style={{ width: "100px", height: "100px" }} src="assets/tiles/tiled2.png"></img>
-                                <span className='m-2' style={{ fontSize: "12px"}}>Revival Penny Blu Title</span>
-                                <span className='m-2' style={{ fontSize: "12px"}}>200x200mm</span>
+                                <span className='m-2' style={{ fontSize: "12px" }}>Revival Penny Blu Title</span>
+                                <span className='m-2' style={{ fontSize: "12px" }}>200x200mm</span>
                             </div>
                             <div className='card m-2 p-4 d-flex align-items-center text-left p-2 rounded' style={{ width: "45%" }}>
                                 <img style={{ width: "100px", height: "100px" }} src="assets/tiles/tiled1.jpg"></img>
-                                <span className='m-2' style={{ fontSize: "12px"}}>Revival Penny Blu Title</span>
-                                <span className='m-2' style={{ fontSize: "12px"}}>200x200mm</span>
+                                <span className='m-2' style={{ fontSize: "12px" }}>Revival Penny Blu Title</span>
+                                <span className='m-2' style={{ fontSize: "12px" }}>200x200mm</span>
                             </div>
                         </div>
                     </div>
@@ -997,23 +1000,27 @@ const UI = observer(() => {
                 </div>
                 <div className='modal' style={{ display: (show ? "block" : "none") }}>
                     <div className='create_window'>
-                        <span className='close1' onClick={() => setShow(false)}>&times;</span>
-                        <label><small>image file: </small></label>
-                        <input type='file' onChange={handleChange} accept="" />
-                        <button onClick={handleUpload}>Upload to Firebase</button>
-                        <p>{percent} % done</p>
-                        <label><small>3D model file: </small></label>
-                        <input type='file' onChange={handleChange1} accept="" />
-                        <button onClick={handleUpload1}>Upload to Firebase</button>
-                        <p>{percent1} % done</p>
-                        <div className='image_info'>
-                            <label>Title:&nbsp;
-                                <input type='text' value={title} onChange={onChangeTitle} />
-                            </label>
-                            <img className='uploadimage' src={imageURL} alt="" />
-                            <button className='submit_button' onClick={saveData}>
-                                Save
-                            </button>
+                        <div className='main_window1'>
+                            <span className='close1' onClick={() => setShow(false)}>&times;</span>
+                            <label><small>Image file </small></label>
+                            <input type='file' onChange={handleChange} accept="" />
+                            <br />
+                            <button onClick={handleUpload}>Upload to Firebase</button>
+                            <p>{percent} % done</p>
+                            <label><small>3D model file </small></label>
+                            <input type='file' onChange={handleChange1} accept="" />
+                            <br />
+                            <button onClick={handleUpload1}>Upload to Firebase</button>
+                            <p>{percent1} % done</p>
+                            <div className='image_info'>
+                                <label>Title:&nbsp;
+                                    <input type='text' value={title} onChange={onChangeTitle} required />
+                                </label>
+                                <img className='uploadimage' src={imageURL} alt="" />
+                                <button className='submit_button' onClick={saveData}>
+                                    Save
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

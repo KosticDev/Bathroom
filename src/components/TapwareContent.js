@@ -32,6 +32,21 @@ export function TapwareContent(props) {
                 <img style={{ width: "70px", scale: "1.2" }} className='m-3 p-2' src="assets/ui/window.svg"></img>
                 <div className='btn m-1 rounded-5 shadow-sm' onClick={() => props.loadBathtub2('assets/doors/bath2.gltf')}>Add to Plan +</div>
             </div>
+            <div className='card d-flex align-items-center text-center p-2 rounded card1 marr'>
+                <span className='m-2'>Shower</span>
+                <img style={{ width: "70px", scale: "1.2" }} className='m-3 p-2' src="assets/ui/Showers.png"></img>
+                <div className='btn m-1 rounded-5 shadow-sm' onClick={() => props.shower()}>Add to Plan +</div>
+            </div>
+            <div className='card d-flex align-items-center text-center p-2 rounded card1 marr'>
+                <span className='m-2'>Tapware</span>
+                <img style={{ width: "70px", scale: "1.2" }} className='m-3 p-2' src="assets/ui/Tapware & Accessories.png"></img>
+                <div className='btn m-1 rounded-5 shadow-sm' onClick={() => props.loadTapware('assets/doors/tapware.gltf')}>Add to Plan +</div>
+            </div>
+            <div className='card d-flex align-items-center text-center p-2 rounded card1 marr'>
+                <span className='m-2'>Wall Mix</span>
+                <img style={{ width: "70px", scale: "1.2" }} className='m-3 p-2' src="assets/ui/Wall.png"></img>
+                <div className='btn m-1 rounded-5 shadow-sm' onClick={() => props.loadTapware('assets/doors/Wall Mix.glb')}>Add to Plan +</div>
+            </div>
             {
                 arrCat.map(arr =>
                     <div className='card d-flex align-items-center text-center p-2 rounded card1 marr'>
@@ -41,7 +56,12 @@ export function TapwareContent(props) {
                     </div>
                 )
             }
-
+            <div className='card d-flex align-items-center text-center p-2 rounded card1 marr'>
+                <span className='m-2'>Wall Mix</span>
+                <img style={{ width: "70px", scale: "1.2" }} className='m-3 p-2' src="assets/ui/modern.JPG"></img>
+                <div className='btn m-1 rounded-5 shadow-sm' onClick={() => props.loadTapware('assets/doors/cioso wall bath set brushed brass.glb')}>Add to Plan +</div>
+            </div>
+            
             {create ? "" : <div className="create" onClick={() => setShow(true)}>
                 <p>Create</p>
             </div>}
