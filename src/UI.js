@@ -285,8 +285,6 @@ const onmousedown = (e) => {
     }
 }
 
-
-
 const onmouseup = (e) => {
 
     isMouseDown = false;
@@ -295,6 +293,9 @@ const onmouseup = (e) => {
     selectedItem = null;
 
     var objectIntersects = raycaster.intersectObjects(objects);
+
+    console.log("this is raycaster");
+    console.log(objectIntersects);
 
     if (objectIntersects.length > 0 && objectIntersects[1].object.visible == true) {
         hoverItem = objectIntersects[0].object;
@@ -351,17 +352,6 @@ const onmousemove = (e) => {
     } else {
         selectedObject = null;
     }
-
-    // var objectIntersects = raycaster.intersectObjects(objects);
-
-    // if (objectIntersects.length > 0) {
-    //     hoverItem = objectIntersects[0].object;
-    //     hoverItem.material.visible = true;
-    // } else if (hoverItem && !isDrag) {
-    //     hoverItem.material.visible = false;
-    // }
-
-
     mapControls.enabled = false;
 }
 
@@ -381,7 +371,6 @@ function deleteObject() {
         temp_object_real = null
     }
 }
-
 
 window.addEventListener('mousemove', onmousemove);
 window.addEventListener('mousedown', onmousedown);
@@ -555,10 +544,10 @@ function Shower() {
     );
 }
 
-function loadBathtub() {
+function loadBathtub(URL) {
     gltfLoader.load(
         // resource URL
-        'assets/doors/bath1.gltf',
+        URL,
         function (gltf) {
             bathtub = gltf.scene;
             bathtub.scale.x = 0.9;
@@ -567,7 +556,7 @@ function loadBathtub() {
             bathtub.rotation.y = Math.PI;
             bathtub.position.x = -1.4;
             InvisibleMat = new THREE.MeshBasicMaterial({ color: 'red', visible: false, transparent: true, opacity: .3 });
-            temp_bathtub = new THREE.Mesh(new THREE.BoxGeometry(wallItems.bathtub.width, wallItems.bathtub.height, wallItems.bathtub.depth), InvisibleMat);
+            temp_bathtub = new THREE.Mesh(new THREE.BoxGeometry(wallItems.bathtub.width - 0.4, wallItems.bathtub.height, wallItems.bathtub.depth - 0.37), InvisibleMat);
             temp_bathtub.geometry.translate(0, wallItems.bathtub.height * .5, 0);
             temp_bathtub.position.set(-1, 0, -1);
             temp_bathtub.userData.normalAxis = AXIS.Y;
@@ -595,7 +584,7 @@ function loadBathtub2(URL) {
             temp_bathtub2.geometry.translate(0, wallItems.bathtub2.height * .5, 0);
             temp_bathtub2.position.set(1, 0, 1);
             temp_bathtub2.userData.normalAxis = AXIS.Y;
-            bathtub2.children[0].material.visible = true;
+            // bathtub2.children[0].material.visible = true;
             temp_bathtub2.add(bathtub2);
             scene.add(temp_bathtub2);
             objects.push(temp_bathtub2);

@@ -25,7 +25,7 @@ export function TapwareContent(props) {
             <div className='card d-flex align-items-center text-center p-2 rounded card1 marr'>
                 <span className='m-2'>Bath & Spas</span>
                 <img style={{ width: "70px", scale: "1.2" }} className='m-3 p-2' src="assets/ui/e09acac1-fc05-4078-bd84-73b765c26c31.png"></img>
-                <div className='btn m-1 rounded-5 shadow-sm' onClick={() => props.loadBathtub()}>Add to Plan +</div>
+                <div className='btn m-1 rounded-5 shadow-sm' onClick={() => props.loadBathtub('assets/doors/bath1.gltf', -1.4, 0.9)}>Add to Plan +</div>
             </div>
             <div className='card d-flex align-items-center text-center p-2 rounded card1 marr'>
                 <span className='m-2'>Window</span>
@@ -57,11 +57,16 @@ export function TapwareContent(props) {
                 )
             }
             <div className='card d-flex align-items-center text-center p-2 rounded card1 marr'>
+                <span className='m-2'>Waverley</span>
+                <img style={{ width: "70px", scale: "1.2" }} className='m-3 p-2' src="assets/ui/Vanity Bag Tex 1.952.png"></img>
+                <div className='btn m-1 rounded-5 shadow-sm' onClick={() => props.loadBathtub2('assets/doors/Waverley Without Bottom.glb')}>Add to Plan +</div>
+            </div>
+            <div className='card d-flex align-items-center text-center p-2 rounded card1 marr'>
                 <span className='m-2'>Wall Mix</span>
                 <img style={{ width: "70px", scale: "1.2" }} className='m-3 p-2' src="assets/ui/modern.JPG"></img>
                 <div className='btn m-1 rounded-5 shadow-sm' onClick={() => props.loadTapware('assets/doors/modern brass cioso color/cioso wall bath set brushed brass.glb')}>Add to Plan +</div>
             </div>
-            
+
             {create ? "" : <div className="create" onClick={() => setShow(true)}>
                 <p>Create</p>
             </div>}

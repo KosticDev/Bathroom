@@ -3,8 +3,9 @@ import { TapwareContent } from "./TapwareContent";
 
 export function Tapware(props) {
     const { show, setShow, header, setHeader, categories, isCategory, setIsCategory } = props;
-    const [isAllCategories, setIsAllCategories] = useState(false);
+    const [ isAllCategories, setIsAllCategories ] = useState(false);
     const { isAdd, setAdd } = useState(false);
+    const [ secondHeader, setSecondHeader] = useState(header);
 
     const Theader = header;
     console.log(Theader,"DFadfadfad7r9q7ru9fdsi")
@@ -22,11 +23,11 @@ export function Tapware(props) {
                 {isAllCategories ?
                     <>
                         <span><img src="assets/ui/left-arrow.svg" style={{ width: "12px", marginRight: "5px" }} /></span>
-                        <p onClick={() => setIsAllCategories(false)}>{header}</p>
+                        <p onClick={() => setIsAllCategories(false)}>{secondHeader}</p>
                     </> : ""}
             </div>
             <div className="d-flex flex-wrap w-100 b_title">
-                <h4>{header}</h4>
+                <h4>{isAllCategories ? header : secondHeader}</h4>
             </div>
             {
                 isAllCategories ? <TapwareContent

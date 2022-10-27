@@ -13,7 +13,7 @@ class  Dimensions{
     constructor(node, group, camera, element, room_type, selectedobject){
 
         this.createPoints(selectedobject, room_type);
-        
+
         element.innerHTML ="";
         for (var i= 0; i < lines.length; i ++) {
             var line = lines[i];   
