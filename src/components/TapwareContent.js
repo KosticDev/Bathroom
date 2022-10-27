@@ -59,7 +59,7 @@ export function TapwareContent(props) {
             <div className='card d-flex align-items-center text-center p-2 rounded card1 marr'>
                 <span className='m-2'>Wall Mix</span>
                 <img style={{ width: "70px", scale: "1.2" }} className='m-3 p-2' src="assets/ui/modern.JPG"></img>
-                <div className='btn m-1 rounded-5 shadow-sm' onClick={() => props.loadTapware('assets/doors/cioso wall bath set brushed brass.glb')}>Add to Plan +</div>
+                <div className='btn m-1 rounded-5 shadow-sm' onClick={() => props.loadTapware('assets/doors/modern brass cioso color/cioso wall bath set brushed brass.glb')}>Add to Plan +</div>
             </div>
             
             {create ? "" : <div className="create" onClick={() => setShow(true)}>

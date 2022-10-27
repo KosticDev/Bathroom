@@ -109,6 +109,12 @@ var mapControls;
 var global_light
 var light_1;
 var light_2;
+var light_3;
+var light_4;
+var light_5;
+var light_6;
+var light_7;
+var light_8;
 
 function init() {
     // const orthoCam = new THREE.OrthographicCamera(-frustum, frustum, frustum, -frustum, 0, 30);
@@ -128,8 +134,14 @@ function initLight() {
     global_light = new THREE.HemisphereLight('white', '', 0.5);
     light_1 = new THREE.PointLight('white', .2, 20, 1);
     light_2 = new THREE.PointLight('white', .2, 20, 1);
+    light_3 = new THREE.PointLight('white', .2, 20, 1);
+    light_4 = new THREE.PointLight('white', .2, 20, 1);
+    light_5 = new THREE.PointLight('white', .2, 20, 1);
+    light_6 = new THREE.PointLight('white', .2, 20, 1);
+    light_7 = new THREE.PointLight('white', .2, 20, 1);
+    light_8 = new THREE.PointLight('white', .2, 20, 1);
 
-    scene.add(global_light, light_1, light_2);
+    scene.add(global_light, light_1, light_2, light_3, light_4, light_5, light_6, light_7, light_8);
     global_light.position.set(10, 10, 10);
 }
 
@@ -227,6 +239,8 @@ function animate() {
 
 function resize() {
     const container = document.getElementById('canvas-container');
+    const goldcolor = new THREE.Color(0xbcbcbc);
+    scene.background = goldcolor;
     container.innerHTML = '';
     container.append(canvas);
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -448,6 +462,12 @@ function GenerateBathroom() {
     orthoCam.position.y = STORE.Height + DELTA_DIS;
     light_1.position.set(-STORE.Width / 2, STORE.Height, 0);
     light_2.position.set(STORE.Width / 2, STORE.Height, 0);
+    light_3.position.set(STORE.Width, 1, 0);
+    light_4.position.set(-STORE.Width, 1, 0);
+    light_5.position.set(0, 1, STORE.Height);
+    light_6.position.set(0, 1, -STORE.Height);
+    light_7.position.set(0, 0, STORE.Height);
+    light_8.position.set(0, 0, -STORE.Height);
 
     createWalls(STORE.type);
 
@@ -489,6 +509,30 @@ function loadDoor(url, num, num1) {
     );
 }
 
+function Window(url, num, num1) {
+    gltfLoader.load(
+        // resource URL
+        url,
+        // called when the resource is loaded
+        function (gltf) {
+            InvisibleMat = new THREE.MeshBasicMaterial({ color: 'red', visible: false, transparent: true, opacity: .3 });
+            temp_door = new THREE.Mesh(new THREE.BoxGeometry(wallItems.door.width, wallItems.door.height / 2, wallItems.door.depth / num1), InvisibleMat);
+            temp_door.geometry.translate(0, wallItems.door.height * .22, 0);
+            temp_door.position.set(0, 1, -STORE.Length / 2 - 0.02);
+            temp_door.userData.normalAxis = AXIS.Z;
+            temp_door.userData.normalVector = new Vector3(0, 0, 1);
+            temp_door.userData.dir = DIR.START;
+            door = gltf.scene;
+            door.scale.x = num;
+            door.scale.y = num;
+            door.scale.z = num / 2;
+            temp_door.add(door);
+            scene.add(temp_door);
+            objects.push(temp_door);
+        },
+    );
+}
+
 function Shower() {
     gltfLoader.load(
         // resource URL
@@ -499,7 +543,7 @@ function Shower() {
             InvisibleMat = new THREE.MeshBasicMaterial({ color: 'red', visible: false, transparent: true, opacity: .3 });
             temp_shower = new THREE.Mesh(new THREE.BoxGeometry(wallItems.shower.width, wallItems.shower.height, wallItems.shower.depth * 5), InvisibleMat);
             temp_shower.geometry.translate(0, wallItems.shower.height * .5, 0);
-            temp_shower.position.set(0, 0, STORE.Length / 2 - 0.1);
+            temp_shower.position.set(0, 0, -STORE.Length / 2 - 0.1);
             temp_shower.userData.normalAxis = AXIS.Z;
             temp_shower.userData.normalVector = new Vector3(0, 0, 1);
             shower.children[0].material.visible = true;
@@ -600,7 +644,7 @@ function loadTapware(URL) {
             // tapware.children[0].material.visible = true;
             temp_tapware.add(tapware);
             scene.add(temp_tapware);
-            objects.push(temp_tapware);
+            objects.push(temp_tapware);          
         },
     );
 }
@@ -623,7 +667,7 @@ const UI = observer(() => {
     const [modelURL, setModelURL] = useState();
     const [title, setTitle] = useState("");
     const [categories, setCategories] = useState([]);
-    const [header, setHeader] = useState('Bath & Spas')
+    const [header, setHeader] = useState();
 
     function AssignVal(e) {
 
@@ -735,6 +779,11 @@ const UI = observer(() => {
             })
     }
 
+    function change(title) {
+        setIsCategory(true);
+        setHeader(title);
+    }
+
     Update();
 
 
@@ -825,7 +874,7 @@ const UI = observer(() => {
                             <div className='card m-2 d-flex align-items-center text-center p-2 rounded' style={{ width: "45%" }}>
                                 <span className='m-2'>Sliding window</span>
                                 <img style={{ width: "80px", height: "80px" }} src="assets/ui/Sliding window.png"></img>
-                                <div className='btn m-2 rounded-5 shadow-sm' onClick={() => loadDoor('assets/doors/sliding.glb', 0.03, 0.9)}>Add to Plan +</div>
+                                <div className='btn m-2 rounded-5 shadow-sm' onClick={() => Window('assets/doors/sliding.glb', 0.03, 0.9)}>Add to Plan +</div>
                             </div>
                             <div className='card m-2 d-flex align-items-center text-center p-2 rounded' style={{ width: "45%" }}>
                                 <span className='m-2'>Traditional door</span>
@@ -860,6 +909,7 @@ const UI = observer(() => {
                         isCategory={isCategory}
                         setIsCategory={setIsCategory}
                         header={header}
+                        setHeader={setHeader}
                         shower={Shower}
                     />
                         : <>
@@ -867,11 +917,11 @@ const UI = observer(() => {
                             <div className='main_window'>
                                 <div className="d-flex flex-wrap w-100">
                                     <div className="d-flex flex-wrap w-100 cards">
-                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1' onClick={() => setIsCategory(true)}>
+                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1' onClick={() => change('Baths & Spas')}>
                                             <img src="assets/ui/e09acac1-fc05-4078-bd84-73b765c26c31.png"></img>
                                             <span className='m-2'>Baths & Spas</span>
                                         </div>
-                                        <div className='card d-flex align-items-center text-center p-2 rounded card1' onClick={() => { setIsCategory(true) }}>
+                                        <div className='card d-flex align-items-center text-center p-2 rounded card1' onClick={() => change('Vanities')}>
                                             <img src="assets/ui/Vanities.png"></img>
                                             <span className='m-2'>Vanities</span>
                                         </div>
@@ -879,11 +929,11 @@ const UI = observer(() => {
                                 </div>
                                 <div className="d-flex flex-wrap w-100">
                                     <div className="d-flex flex-wrap w-100 cards">
-                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1' onClick={() => setIsCategory(true)}>
+                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1' onClick={() => change('Shavers & Mirrors')}>
                                             <img src="assets/ui/Shavers and Mirrors.png"></img>
                                             <span className='m-2'>Shavers & Mirrors</span>
                                         </div>
-                                        <div className='card d-flex align-items-center text-center p-2 rounded card1' onClick={() => setIsCategory(true)}>
+                                        <div className='card d-flex align-items-center text-center p-2 rounded card1' onClick={() => change('Basins')}>
                                             <img src="assets/ui/Basins.png"></img>
                                             <span className='m-2'>Basins</span>
                                         </div>
@@ -891,11 +941,11 @@ const UI = observer(() => {
                                 </div>
                                 <div className="d-flex flex-wrap w-100">
                                     <div className="d-flex flex-wrap w-100 cards">
-                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1' onClick={() => setIsCategory(true)}>
+                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1' onClick={() => change('Showers')}>
                                             <img src="assets/ui/Showers.png"></img>
                                             <span className='m-2'>Showers</span>
                                         </div>
-                                        <div className='card d-flex align-items-center text-center p-2 rounded card1' onClick={() => setIsCategory(true)}>
+                                        <div className='card d-flex align-items-center text-center p-2 rounded card1' onClick={() => change('Tapware & Accessories')}>
                                             <img src="assets/ui/Tapware & Accessories.png"></img>
                                             <span className='m-2'>Tapware & Accessories</span>
                                         </div>
@@ -903,11 +953,11 @@ const UI = observer(() => {
                                 </div>
                                 <div className="d-flex flex-wrap w-100">
                                     <div className="d-flex flex-wrap w-100 cards">
-                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1' onClick={() => setIsCategory(true)}>
+                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1' onClick={() => change('Toilets')}>
                                             <img src="assets/ui/Toilets.png"></img>
                                             <span className='m-2'>Toilets</span>
                                         </div>
-                                        <div className='card d-flex align-items-center text-center p-2 rounded card1' onClick={() => setIsCategory(true)}>
+                                        <div className='card d-flex align-items-center text-center p-2 rounded card1' onClick={() => change('Wastes & Plumbing')}>
                                             <img src="assets/ui/Wastes & Plumbing.png"></img>
                                             <span className='m-2'>Wastes & Plumbing</span>
                                         </div>
