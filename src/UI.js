@@ -74,7 +74,7 @@ const mouse = new THREE.Vector2(), raycaster = new THREE.Raycaster();
 const canvas = document.createElement('canvas');
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0X808080);
+scene.background = new THREE.Color(0x808080);
 
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, .01, 50);
 function initCamera() {
@@ -294,10 +294,10 @@ const onmouseup = (e) => {
 
     var objectIntersects = raycaster.intersectObjects(objects);
 
-    console.log("this is raycaster");
+    console.log("This is reycast");
     console.log(objectIntersects);
 
-    if (objectIntersects.length > 0 && objectIntersects[1].object.visible == true) {
+    if (objectIntersects.length > 0 && objectIntersects[0].object.visible == true)  {
         hoverItem = objectIntersects[0].object;
         hoverItem.material.visible = true;
 
@@ -470,7 +470,7 @@ function GenerateMeasurements() {
     }
     dims = [];
     if (STORE.view !== 1)
-        new Dimensions(scene, dims, orthoCam, labelRenderer.domElement, STORE.type, temp_bathtub);
+        new Dimensions(scene, dims, orthoCam, labelRenderer.domElement, STORE.type, temp_object);
 
 }
 
@@ -580,7 +580,7 @@ function loadBathtub2(URL) {
             bathtub2.scale.z = 0.9;
             bathtub2.rotation.y = Math.PI;
             InvisibleMat = new THREE.MeshBasicMaterial({ color: 'red', visible: false, transparent: true, opacity: .3 });
-            temp_bathtub2 = new THREE.Mesh(new THREE.BoxGeometry(wallItems.bathtub2.width, wallItems.bathtub2.height, wallItems.bathtub2.depth), InvisibleMat);
+            temp_bathtub2 = new THREE.Mesh(new THREE.BoxGeometry(wallItems.bathtub2.width - 0.58, wallItems.bathtub2.height, wallItems.bathtub2.depth - 0.3), InvisibleMat);
             temp_bathtub2.geometry.translate(0, wallItems.bathtub2.height * .5, 0);
             temp_bathtub2.position.set(1, 0, 1);
             temp_bathtub2.userData.normalAxis = AXIS.Y;
@@ -976,21 +976,13 @@ const UI = observer(() => {
                                 <img style={{ width: "100px", height: "100px" }} src="assets/tiles/tiled2.png"></img>
                                 <span className='m-2' style={{ fontSize: "12px" }}>Revival Penny Blu Title</span>
                                 <span className='m-2' style={{ fontSize: "12px" }}>200x200mm</span>
+                                <div className='hover1'><p>+</p></div>
                             </div>
                             <div className='card m-2 p-4 d-flex align-items-center text-left p-2 rounded' style={{ width: "45%" }}>
                                 <img style={{ width: "100px", height: "100px" }} src="assets/tiles/tiled3.png"></img>
                                 <span className='m-2' style={{ fontSize: "12px" }}>Revival Penny Blu Title</span>
                                 <span className='m-2' style={{ fontSize: "12px" }}>200x200mm</span>
-                            </div>
-                            <div className='card m-2 p-4 d-flex align-items-center text-left p-2 rounded' style={{ width: "45%" }}>
-                                <img style={{ width: "100px", height: "100px" }} src="assets/tiles/tiled2.png"></img>
-                                <span className='m-2' style={{ fontSize: "12px" }}>Revival Penny Blu Title</span>
-                                <span className='m-2' style={{ fontSize: "12px" }}>200x200mm</span>
-                            </div>
-                            <div className='card m-2 p-4 d-flex align-items-center text-left p-2 rounded' style={{ width: "45%" }}>
-                                <img style={{ width: "100px", height: "100px" }} src="assets/tiles/tiled1.jpg"></img>
-                                <span className='m-2' style={{ fontSize: "12px" }}>Revival Penny Blu Title</span>
-                                <span className='m-2' style={{ fontSize: "12px" }}>200x200mm</span>
+                                <div className='hover1'><p>+</p></div>
                             </div>
                         </div>
                     </div>

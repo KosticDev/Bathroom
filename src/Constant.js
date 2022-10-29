@@ -18,7 +18,19 @@ export const DELTA_DIS = 1.0;
 export const WALL_MAP = [
     {
         name: 'tile1',
+        diffuse: 'tiled1.jpg',
+        specular: 'tiles1.png',
+        normal: 'tilen1.png'
+    },
+    {
+        name: 'tile2',
         diffuse: 'tiled2.png',
+        specular: 'tiles1.png',
+        normal: 'tilen1.png'
+    },
+    {
+        name: 'tile1',
+        diffuse: 'tiled3.png',
         specular: 'tiles1.png',
         normal: 'tilen1.png'
     }
