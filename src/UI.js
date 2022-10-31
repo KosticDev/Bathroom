@@ -94,7 +94,7 @@ renderer.outputEncoding = THREE.sRGBEncoding;
 const orbitControls = new OrbitControls(camera, renderer.domElement);
 
 function initOrbit() {
-    orbitControls.minDistance = 5;
+    orbitControls.minDistance = 3;
     orbitControls.maxDistance = 20;
     orbitControls.maxPolarAngle = 1.5;
     orbitControls.minAzimuthAngle = .1;
@@ -556,7 +556,7 @@ function loadBathtub(URL) {
             bathtub.rotation.y = Math.PI;
             bathtub.position.x = -1.4;
             InvisibleMat = new THREE.MeshBasicMaterial({ color: 'red', visible: false, transparent: true, opacity: .3 });
-            temp_bathtub = new THREE.Mesh(new THREE.BoxGeometry(wallItems.bathtub.width - 0.4, wallItems.bathtub.height, wallItems.bathtub.depth - 0.37), InvisibleMat);
+            temp_bathtub = new THREE.Mesh(new THREE.BoxGeometry(wallItems.bathtub.width - 0.45, wallItems.bathtub.height, wallItems.bathtub.depth - 0.37), InvisibleMat);
             temp_bathtub.geometry.translate(0, wallItems.bathtub.height * .5, 0);
             temp_bathtub.position.set(-1, 0, -1);
             temp_bathtub.userData.normalAxis = AXIS.Y;
@@ -568,7 +568,7 @@ function loadBathtub(URL) {
     );
 }
 
-function loadBathtub2(URL) {
+function loadBathtub2(URL, num, num1) {
     console.log(URL, "dsfsadfad---------dsfasd-fadsf-----")
     gltfLoader.load(
         // resource URL
@@ -580,7 +580,7 @@ function loadBathtub2(URL) {
             bathtub2.scale.z = 0.9;
             bathtub2.rotation.y = Math.PI;
             InvisibleMat = new THREE.MeshBasicMaterial({ color: 'red', visible: false, transparent: true, opacity: .3 });
-            temp_bathtub2 = new THREE.Mesh(new THREE.BoxGeometry(wallItems.bathtub2.width - 0.58, wallItems.bathtub2.height, wallItems.bathtub2.depth - 0.3), InvisibleMat);
+            temp_bathtub2 = new THREE.Mesh(new THREE.BoxGeometry(wallItems.bathtub2.width - num, wallItems.bathtub2.height, wallItems.bathtub2.depth - num1), InvisibleMat);
             temp_bathtub2.geometry.translate(0, wallItems.bathtub2.height * .5, 0);
             temp_bathtub2.position.set(1, 0, 1);
             temp_bathtub2.userData.normalAxis = AXIS.Y;
@@ -614,7 +614,7 @@ function loadBathtub1() {
     );
 }
 
-function loadTapware(URL) {
+function loadTapware(URL, num, num1, num2) {
 
     gltfLoader.load(
         // resource URL
@@ -626,7 +626,7 @@ function loadTapware(URL) {
             tapware.scale.z = 2;
             tapware.rotation.y = Math.PI;
             InvisibleMat = new THREE.MeshBasicMaterial({ color: 'red', visible: false, transparent: true, opacity: .3 });
-            temp_tapware = new THREE.Mesh(new THREE.BoxGeometry(wallItems.tapware.width / 10, wallItems.tapware.height / 2, wallItems.tapware.depth / 2), InvisibleMat);
+            temp_tapware = new THREE.Mesh(new THREE.BoxGeometry(wallItems.tapware.width / 10 - num, wallItems.tapware.height / 2 - num2, wallItems.tapware.depth / 2 - num1), InvisibleMat);
             temp_tapware.geometry.translate(0, wallItems.tapware.height * .01, 0);
             temp_tapware.position.set(1, 0.12, 1);
             temp_tapware.userData.normalAxis = AXIS.Y;
@@ -1024,7 +1024,7 @@ const UI = observer(() => {
                         <img onClick={e => STORE.view = 1} className={(STORE.view === 1 ? 'active ' : '') + 'btn p-2 bg-light  m-3 rounded-1 padding'} src="assets/ui/3d.png" alt="" />
                         <img className="btn p-2 bg-light  m-3 rounded-1 padding" src="assets/ui/VR.png" alt="" />
                         <img onClick={e => { STORE.scale += 0.1; console.log(STORE.scale); init() }} className='d-block shadow-focus btn p-2 bg-light  m-3 rounded-1 radius' src="assets/ui/zoomin.svg" alt="" />
-                        <img className='d-block shadow-focus btn p-2 bg-light  m-3 rounded-1 radius' src="assets/ui/zoomout.svg" alt="" />
+                        <img onClick={e => { STORE.scale -= 0.1; console.log(STORE.scale); init() }} className='d-block shadow-focus btn p-2 bg-light  m-3 rounded-1 radius' src="assets/ui/zoomout.svg" alt="" />
                         <img className='d-block shadow-focus btn p-2 bg-light  m-3 rounded-1 radius1' src="assets/ui/back.png" style={{ width: "37px" }} alt="" />
                         <img className='d-block shadow-focus btn p-2 bg-light  m-3 rounded-1 radius1' src="assets/ui/forward.png" style={{ width: "37px" }} alt="" />
                     </div>

@@ -44,9 +44,9 @@ class Wall extends THREE.Mesh {
     }
 
     loadTextures(){
-        this.material.map = textLoader.load('assets/tiles/' + WALL_MAP[0].diffuse);
-        this.material.roughnessMap = textLoader.load('assets/tiles/' + WALL_MAP[0].specular);
-        this.material.normalMap = textLoader.load('assets/tiles/' + WALL_MAP[0].normal);
+        this.material.map = textLoader.load('assets/tiles/' + WALL_MAP[1].diffuse);
+        this.material.roughnessMap = textLoader.load('assets/tiles/' + WALL_MAP[1].specular);
+        this.material.normalMap = textLoader.load('assets/tiles/' + WALL_MAP[1].normal);
         this.material.roughnessMap.repeat.x = this.userData.initlength * this.scale.z/TILE_SIZE;
         this.material.roughnessMap.repeat.y = this.userData.initheight * this.scale.y/TILE_SIZE;
         this.material.map.repeat.x = this.userData.initlength * this.scale.z/TILE_SIZE;
