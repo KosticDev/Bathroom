@@ -666,6 +666,15 @@ const UI = observer(() => {
     const [title, setTitle] = useState("");
     const [categories, setCategories] = useState([]);
     const [header, setHeader] = useState();
+    const [datas, setDatas] = useState();
+    const data1 = ['Fresstanding baths', 'Built baths', 'Coner baths', 'Spa baths'];
+    const data2 = ['Wall hung Vanity', 'To floor Vanity', 'Corner Vanity'];
+    const data3 = ['Shaving Cabinets', 'Mirrors'];
+    const data4 = ['Above Counter', 'Wall Hung', 'Undermount', 'Semi Inset'];
+    const data5 = ['Walk Around', 'Corner', 'Frameless', 'Semi Frameless'];
+    const data6 = ['Mixers', 'Showers', 'Bidet', 'Accessories'];
+    const data7 = ['Back to wall', 'Inwall', 'Bidet Toilet Seat', 'Wall Hung'];
+    const data8 = ['Tile Insert', 'Bar Grates'];
 
     function AssignVal(e) {
 
@@ -777,9 +786,10 @@ const UI = observer(() => {
             })
     }
 
-    function change(title) {
+    function change(title, data) {
         setIsCategory(true);
         setHeader(title);
+        setDatas(data);
     }
 
     Update();
@@ -909,17 +919,19 @@ const UI = observer(() => {
                         header={header}
                         setHeader={setHeader}
                         shower={Shower}
+                        setDatas={setDatas}
+                        datas={datas}
                     />
                         : <>
                             <input placeholder='Search all products' type="search" className='d-flex w-100 rounded-4 shadow-sm search' style={{ height: 40, border: "none" }} />
                             <div className='main_window'>
                                 <div className="d-flex flex-wrap w-100">
                                     <div className="d-flex flex-wrap w-100 cards">
-                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1' onClick={() => change('Baths & Spas')}>
+                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1' onClick={() => change('Baths & Spas', data1)}>
                                             <img src="assets/ui/e09acac1-fc05-4078-bd84-73b765c26c31.png"></img>
                                             <span className='m-2'>Baths & Spas</span>
                                         </div>
-                                        <div className='card d-flex align-items-center text-center p-2 rounded card1' onClick={() => change('Vanities')}>
+                                        <div className='card d-flex align-items-center text-center p-2 rounded card1' onClick={() => change('Vanities', data2)}>
                                             <img src="assets/ui/Vanities.png"></img>
                                             <span className='m-2'>Vanities</span>
                                         </div>
@@ -927,11 +939,11 @@ const UI = observer(() => {
                                 </div>
                                 <div className="d-flex flex-wrap w-100">
                                     <div className="d-flex flex-wrap w-100 cards">
-                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1' onClick={() => change('Shavers & Mirrors')}>
+                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1' onClick={() => change('Shavers & Mirrors', data3)}>
                                             <img src="assets/ui/Shavers and Mirrors.png"></img>
                                             <span className='m-2'>Shavers & Mirrors</span>
                                         </div>
-                                        <div className='card d-flex align-items-center text-center p-2 rounded card1' onClick={() => change('Basins')}>
+                                        <div className='card d-flex align-items-center text-center p-2 rounded card1' onClick={() => change('Basins',data4)}>
                                             <img src="assets/ui/Basins.png"></img>
                                             <span className='m-2'>Basins</span>
                                         </div>
@@ -939,25 +951,25 @@ const UI = observer(() => {
                                 </div>
                                 <div className="d-flex flex-wrap w-100">
                                     <div className="d-flex flex-wrap w-100 cards">
-                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1' onClick={() => change('Showers')}>
+                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1' onClick={() => change('Showers',data5)}>
                                             <img src="assets/ui/Showers.png"></img>
-                                            <span className='m-2'>Showers</span>
+                                            <span className='m-2'>Shower Screens</span>
                                         </div>
-                                        <div className='card d-flex align-items-center text-center p-2 rounded card1' onClick={() => change('Tapware & Accessories')}>
+                                        <div className='card d-flex align-items-center text-center p-2 rounded card1' onClick={() => change('Tapware & Accessories',data6)}>
                                             <img src="assets/ui/Tapware & Accessories.png"></img>
-                                            <span className='m-2'>Tapware & Accessories</span>
+                                            <span className='m-2'>Taps & Accessories</span>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="d-flex flex-wrap w-100">
                                     <div className="d-flex flex-wrap w-100 cards">
-                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1' onClick={() => change('Toilets')}>
+                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1' onClick={() => change('Toilets',data7)}>
                                             <img src="assets/ui/Toilets.png"></img>
                                             <span className='m-2'>Toilets</span>
                                         </div>
-                                        <div className='card d-flex align-items-center text-center p-2 rounded card1' onClick={() => change('Wastes & Plumbing')}>
+                                        <div className='card d-flex align-items-center text-center p-2 rounded card1' onClick={() => change('Wastes & Plumbing',data8)}>
                                             <img src="assets/ui/Wastes & Plumbing.png"></img>
-                                            <span className='m-2'>Wastes & Plumbing</span>
+                                            <span className='m-2'>Wastes and Plumbing</span>
                                         </div>
                                     </div>
                                 </div>
