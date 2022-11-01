@@ -128,6 +128,7 @@ function init() {
     mapControls.maxZoom = frustum;
     orthoCam.updateProjectionMatrix();
 }
+
 init()
 
 function initLight() {
@@ -162,6 +163,7 @@ function DragObject(vec3, object, selectedwall) {
     switch (selectedwall.userData.normalAxis) {
         case AXIS.X:
             object.position.x = vec3.x;
+            object.position.y = vec3.y;
             object.position.z = vec3.z;
             object.userData.normalAxis = AXIS.X;
             if (selectedwall.userData.dir == DIR.START) {
@@ -175,6 +177,7 @@ function DragObject(vec3, object, selectedwall) {
             break;
         case AXIS.Z:
             object.position.x = vec3.x;
+            object.position.y = vec3.y;
             object.position.z = vec3.z;
             object.userData.normalAxis = AXIS.Z;
             if (selectedwall.userData.dir == DIR.START) {
@@ -188,8 +191,14 @@ function DragObject(vec3, object, selectedwall) {
             break;
         case AXIS.Y:
             object.position.x = vec3.x;
+            object.position.y = vec3.y;
             object.position.z = vec3.z;
-            break;
+            if(object.position.x > 1.5) object.position.x = 1.5;
+            if(object.position.x < -1.5) object.position.x = -1.5;
+            if(object.position.z > 1.5) object.position.z = 1.5; 
+            if(object.position.z < -1.5) object.position.z = -1.5; 
+
+
         default:
             break;
     }
@@ -270,10 +279,10 @@ const onmousedown = (e) => {
     mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
     mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
 
-    if (e.touches) {
-        mouse.x = ((e.touches[0].clientX - rect.left) / rect.width) * 2 - 1;
-        mouse.y = -((e.touches[0].clientY - rect.top) / rect.height) * 2 + 1;
-    }
+    // if (e.touches) {
+    //     mouse.x = ((e.touches[0].clientX - rect.left) / rect.width) * 2 + 1;
+    //     mouse.y = -((e.touches[0].clientY - rect.top) / rect.height) * 2 - 1;
+    // }
 
     raycaster.setFromCamera(mouse, camera);
 
@@ -324,10 +333,10 @@ const onmousemove = (e) => {
     mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
     mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
 
-    if (e.touches) {
-        mouse.x = ((e.touches[0].clientX - rect.left) / rect.width) * 2 - 1;
-        mouse.y = -((e.touches[0].clientY - rect.top) / rect.height) * 2 + 1;
-    }
+    // if (e.touches) {
+    //     mouse.x = ((e.touches[0].clientX - rect.left) / rect.width) * 2 - 1;
+    //     mouse.y = -((e.touches[0].clientY - rect.top) / rect.height) * 2 + 1;
+    // }
 
     let temp_camera;
     if (STORE.view == 1)
@@ -664,14 +673,14 @@ const UI = observer(() => {
         if (door !== null) {
             if (door.children[0].userData.normalAxis === AXIS.X) {
                 if (door.children[0].userData.dir === DIR.START)
-                    door.position.x = -STORE.Width / 2;
+                    door.position.x = -STORE.Width;
                 else
-                    door.position.x = STORE.Width / 2;
+                    door.position.x = STORE.Width;
             } else if (door.children[0].userData.normalAxis === AXIS.Z) {
                 if (door.children[0].userData.dir === DIR.START)
-                    door.position.z = -STORE.Length / 2;
+                    door.position.z = -STORE.Length;
                 else
-                    door.position.z = STORE.Length / 2;
+                    door.position.z = STORE.Length;
             }
         }
     }
@@ -807,7 +816,7 @@ const UI = observer(() => {
                         })}
                     </div>
                 </div>
-                <div className="d-flex flex-wrap w-100">
+                <div className="d-flex flexwrap w-100">
                     <h6 className='trig-btn py-3 w-100' style={{ color: "#555", paddingLeft: "20px" }}> Room  Dimensions</h6>
                     <div className="p-3 d-flex bg-white justify-content-between shadow-sm mb-3 flex-nowrap">
                         <span style={{ width: "100%" }}>Room Width</span>
