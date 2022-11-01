@@ -47,6 +47,11 @@ export function TapwareContent(props) {
                 <img style={{ width: "70px", scale: "1.2" }} className='m-3 p-2' src="assets/ui/Wall.png"></img>
                 <div className='btn m-1 rounded-5 shadow-sm' onClick={() => props.loadTapware('assets/doors/Wall Mix.glb', 0, 0.35, 0.25)}>Add to Plan +</div>
             </div>
+            <div className='card d-flex align-items-center text-center p-2 rounded card1 marr'>
+                <span className='m-2'>Waverley</span>
+                <img style={{ width: "70px", scale: "1.2" }} className='m-3 p-2' src="assets/ui/Evie 1500.jpg"></img>
+                <div className='btn m-1 rounded-5 shadow-sm' onClick={() => props.loadBathtub2('assets/doors/Evie EBT1500.gltf', 0.5, 0.29)}>Add to Plan +</div>
+            </div>
             {
                 arrCat.map(arr =>
                     <div className='card d-flex align-items-center text-center p-2 rounded card1 marr'>
