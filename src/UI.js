@@ -826,7 +826,7 @@ const UI = observer(() => {
                         })}
                     </div>
                 </div>
-                <div className="d-flex flexwrap w-100">
+                <div className="d-flex flexwrap w-100" style={{flexDirection: "column"}}>
                     <h6 className='trig-btn py-3 w-100' style={{ color: "#555", paddingLeft: "20px" }}> Room  Dimensions</h6>
                     <div className="p-3 d-flex bg-white justify-content-between shadow-sm mb-3 flex-nowrap">
                         <span style={{ width: "100%" }}>Room Width</span>
