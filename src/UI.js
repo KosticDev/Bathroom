@@ -20,7 +20,7 @@ import { render } from '@testing-library/react';
 import Navbar from "./components/Navbar"
 import Sidebar from "./components/Sidebar"
 import { Dimensions } from "./components/dimension";
-import { Tapware } from './components/Tapware';
+import { SubHeader } from './components/SubHeader';
 import storage from './components/Firebase/firebaseConfig';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage'
 import CreateDate from './components/Firebase/Create'
@@ -69,7 +69,7 @@ gltfLoader.setDRACOLoader(dracoLoader);
 let objects = [];
 
 const mouse = new THREE.Vector2(), raycaster = new THREE.Raycaster();
-
+const mouseRemember = new THREE.Vector2();
 
 const canvas = document.createElement('canvas');
 
@@ -128,7 +128,6 @@ function init() {
     mapControls.maxZoom = frustum;
     orthoCam.updateProjectionMatrix();
 }
-
 init()
 
 function initLight() {
@@ -157,14 +156,29 @@ let InvisibleMat;
 // // scene.add(box);
 
 
+function adjustCorner(pos, corner, length) {
+    if (pos + length > corner){
+        return [corner - length, pos - corner + length ];
+    }
+    if (pos - length < -corner){
+        return [-corner + length, -corner + length - pos];
+    }
+    return [pos, 0];
 
+}
 function DragObject(vec3, object, selectedwall) {
     isDrag = true;
+
+    let margin = 0;
+    const xx= STORE.width / 2000;
+    const zz= STORE.length / 2000;
+    const yy= STORE.height / 1000;
+    let ow= object.geometry.parameters.width/2;
+    let oz= object.geometry.parameters.depth/2;
+    let oy= object.geometry.parameters.height;
+
     switch (selectedwall.userData.normalAxis) {
         case AXIS.X:
-            object.position.x = vec3.x;
-            object.position.y = vec3.y;
-            object.position.z = vec3.z;
             object.userData.normalAxis = AXIS.X;
             if (selectedwall.userData.dir == DIR.START) {
                 object.rotation.y = Math.PI / 2;
@@ -174,11 +188,12 @@ function DragObject(vec3, object, selectedwall) {
                 object.rotation.y = -Math.PI / 2;
                 object.userData.dir = DIR.END;
             }
+            [ object.position.x, margin ] = adjustCorner(vec3.x, xx, oz);
+            [ object.position.z, margin ] = adjustCorner(vec3.z, zz, ow);
+            if (vec3.y + oy > yy) object.position.y = yy - oy;
+            else object.position.y = vec3.y;
             break;
         case AXIS.Z:
-            object.position.x = vec3.x;
-            object.position.y = vec3.y;
-            object.position.z = vec3.z;
             object.userData.normalAxis = AXIS.Z;
             if (selectedwall.userData.dir == DIR.START) {
                 object.rotation.y = 0;
@@ -188,21 +203,19 @@ function DragObject(vec3, object, selectedwall) {
                 object.rotation.y = -Math.PI;
                 object.userData.dir = DIR.END;
             }
+            [ object.position.x, margin ] = adjustCorner(vec3.x, xx, ow);
+            [ object.position.z, margin ] = adjustCorner(vec3.z, zz, oz);
+            if (vec3.y + oy > yy) object.position.y = yy - oy;
+            else object.position.y = vec3.y;
             break;
         case AXIS.Y:
-            object.position.x = vec3.x;
-            object.position.y = vec3.y;
-            object.position.z = vec3.z;
-            if(object.position.x > 1.5) object.position.x = 1.5;
-            if(object.position.x < -1.5) object.position.x = -1.5;
-            if(object.position.z > 1.5) object.position.z = 1.5; 
-            if(object.position.z < -1.5) object.position.z = -1.5; 
+            [ object.position.x, margin ] = adjustCorner(vec3.x, xx, ow);
+            [ object.position.z, margin ] = adjustCorner(vec3.z, zz, oz);
 
-
+            break;
         default:
             break;
     }
-
 }
 
 function isFacingCamera(object) {
@@ -279,10 +292,10 @@ const onmousedown = (e) => {
     mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
     mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
 
-    // if (e.touches) {
-    //     mouse.x = ((e.touches[0].clientX - rect.left) / rect.width) * 2 + 1;
-    //     mouse.y = -((e.touches[0].clientY - rect.top) / rect.height) * 2 - 1;
-    // }
+    if (e.touches) {
+        mouse.x = ((e.touches[0].clientX - rect.left) / rect.width) * 2 - 1;
+        mouse.y = -((e.touches[0].clientY - rect.top) / rect.height) * 2 + 1;
+    }
 
     raycaster.setFromCamera(mouse, camera);
 
@@ -303,8 +316,6 @@ const onmouseup = (e) => {
 
     var objectIntersects = raycaster.intersectObjects(objects);
 
-    console.log("This is reycast");
-    console.log(objectIntersects);
 
     if (objectIntersects.length > 0 && objectIntersects[0].object.visible == true)  {
         hoverItem = objectIntersects[0].object;
@@ -333,11 +344,6 @@ const onmousemove = (e) => {
     mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
     mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
 
-    // if (e.touches) {
-    //     mouse.x = ((e.touches[0].clientX - rect.left) / rect.width) * 2 - 1;
-    //     mouse.y = -((e.touches[0].clientY - rect.top) / rect.height) * 2 + 1;
-    // }
-
     let temp_camera;
     if (STORE.view == 1)
         temp_camera = camera;
@@ -350,12 +356,7 @@ const onmousemove = (e) => {
 
         selectedObject = intersects[0].object;
         if (isMouseDown && selectedItem) {
-            if (selectedItem.userData.normalAxis === AXIS.Y && selectedObject.userData.normalAxis === AXIS.Y) {
-                DragObject(intersects[0].point, selectedItem, selectedObject);
-            }
-            else if (selectedItem.userData.normalAxis !== AXIS.Y && selectedObject.userData.normalAxis !== AXIS.Y) {
-                DragObject(intersects[0].point, selectedItem, selectedObject);
-            }
+            DragObject(intersects[0].point, selectedItem, selectedObject);
         }
 
     } else {
@@ -372,7 +373,6 @@ $('body').keydown(function (event) {
 })
 
 function deleteObject() {
-    console.log("here")
     if (temp_object_real != null) {
         temp_object.visible = false
         temp_object_real.visible = false
@@ -578,7 +578,6 @@ function loadBathtub(URL) {
 }
 
 function loadBathtub2(URL, num, num1) {
-    console.log(URL, "dsfsadfad---------dsfasd-fadsf-----")
     gltfLoader.load(
         // resource URL
         URL,
@@ -666,15 +665,6 @@ const UI = observer(() => {
     const [title, setTitle] = useState("");
     const [categories, setCategories] = useState([]);
     const [header, setHeader] = useState();
-    const [datas, setDatas] = useState();
-    const data1 = ['Fresstanding baths', 'Built baths', 'Coner baths', 'Spa baths'];
-    const data2 = ['Wall hung Vanity', 'To floor Vanity', 'Corner Vanity'];
-    const data3 = ['Shaving Cabinets', 'Mirrors'];
-    const data4 = ['Above Counter', 'Wall Hung', 'Undermount', 'Semi Inset'];
-    const data5 = ['Walk Around', 'Corner', 'Frameless', 'Semi Frameless'];
-    const data6 = ['Mixers', 'Showers', 'Bidet', 'Accessories'];
-    const data7 = ['Back to wall', 'Inwall', 'Bidet Toilet Seat', 'Wall Hung'];
-    const data8 = ['Tile Insert', 'Bar Grates'];
 
     function AssignVal(e) {
 
@@ -682,14 +672,14 @@ const UI = observer(() => {
         if (door !== null) {
             if (door.children[0].userData.normalAxis === AXIS.X) {
                 if (door.children[0].userData.dir === DIR.START)
-                    door.position.x = -STORE.Width;
+                    door.position.x = -STORE.Width / 2;
                 else
-                    door.position.x = STORE.Width;
+                    door.position.x = STORE.Width / 2;
             } else if (door.children[0].userData.normalAxis === AXIS.Z) {
                 if (door.children[0].userData.dir === DIR.START)
-                    door.position.z = -STORE.Length;
+                    door.position.z = -STORE.Length / 2;
                 else
-                    door.position.z = STORE.Length;
+                    door.position.z = STORE.Length / 2;
             }
         }
     }
@@ -786,10 +776,9 @@ const UI = observer(() => {
             })
     }
 
-    function change(title, data) {
+    function change(title) {
         setIsCategory(true);
         setHeader(title);
-        setDatas(data);
     }
 
     Update();
@@ -826,7 +815,7 @@ const UI = observer(() => {
                         })}
                     </div>
                 </div>
-                <div className="d-flex flexwrap w-100" style={{flexDirection: "column"}}>
+                <div className="d-flex flex-wrap w-100">
                     <h6 className='trig-btn py-3 w-100' style={{ color: "#555", paddingLeft: "20px" }}> Room  Dimensions</h6>
                     <div className="p-3 d-flex bg-white justify-content-between shadow-sm mb-3 flex-nowrap">
                         <span style={{ width: "100%" }}>Room Width</span>
@@ -905,7 +894,7 @@ const UI = observer(() => {
                     <span className='close'>X</span>
                 </div>
                 {
-                    isCategory ? <Tapware
+                    isCategory ? <SubHeader
                         categories={categories}
                         isAdd={isAdd}
                         setAdd={setAdd}
@@ -919,19 +908,17 @@ const UI = observer(() => {
                         header={header}
                         setHeader={setHeader}
                         shower={Shower}
-                        setDatas={setDatas}
-                        datas={datas}
                     />
                         : <>
                             <input placeholder='Search all products' type="search" className='d-flex w-100 rounded-4 shadow-sm search' style={{ height: 40, border: "none" }} />
                             <div className='main_window'>
                                 <div className="d-flex flex-wrap w-100">
                                     <div className="d-flex flex-wrap w-100 cards">
-                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1' onClick={() => change('Baths & Spas', data1)}>
+                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1' onClick={() => change('Baths & Spas')}>
                                             <img src="assets/ui/e09acac1-fc05-4078-bd84-73b765c26c31.png"></img>
                                             <span className='m-2'>Baths & Spas</span>
                                         </div>
-                                        <div className='card d-flex align-items-center text-center p-2 rounded card1' onClick={() => change('Vanities', data2)}>
+                                        <div className='card d-flex align-items-center text-center p-2 rounded card1' onClick={() => change('Vanities')}>
                                             <img src="assets/ui/Vanities.png"></img>
                                             <span className='m-2'>Vanities</span>
                                         </div>
@@ -939,11 +926,11 @@ const UI = observer(() => {
                                 </div>
                                 <div className="d-flex flex-wrap w-100">
                                     <div className="d-flex flex-wrap w-100 cards">
-                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1' onClick={() => change('Shavers & Mirrors', data3)}>
+                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1' onClick={() => change('Shavers & Mirrors')}>
                                             <img src="assets/ui/Shavers and Mirrors.png"></img>
                                             <span className='m-2'>Shavers & Mirrors</span>
                                         </div>
-                                        <div className='card d-flex align-items-center text-center p-2 rounded card1' onClick={() => change('Basins',data4)}>
+                                        <div className='card d-flex align-items-center text-center p-2 rounded card1' onClick={() => change('Basins')}>
                                             <img src="assets/ui/Basins.png"></img>
                                             <span className='m-2'>Basins</span>
                                         </div>
@@ -951,25 +938,25 @@ const UI = observer(() => {
                                 </div>
                                 <div className="d-flex flex-wrap w-100">
                                     <div className="d-flex flex-wrap w-100 cards">
-                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1' onClick={() => change('Showers',data5)}>
+                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1' onClick={() => change('Showers')}>
                                             <img src="assets/ui/Showers.png"></img>
-                                            <span className='m-2'>Shower Screens</span>
+                                            <span className='m-2'>Showers</span>
                                         </div>
-                                        <div className='card d-flex align-items-center text-center p-2 rounded card1' onClick={() => change('Tapware & Accessories',data6)}>
+                                        <div className='card d-flex align-items-center text-center p-2 rounded card1' onClick={() => change('Tapware & Accessories')}>
                                             <img src="assets/ui/Tapware & Accessories.png"></img>
-                                            <span className='m-2'>Taps & Accessories</span>
+                                            <span className='m-2'>Tapware & Accessories</span>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="d-flex flex-wrap w-100">
                                     <div className="d-flex flex-wrap w-100 cards">
-                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1' onClick={() => change('Toilets',data7)}>
+                                        <div className='card  d-flex align-items-center text-center p-2 rounded card1' onClick={() => change('Toilets')}>
                                             <img src="assets/ui/Toilets.png"></img>
                                             <span className='m-2'>Toilets</span>
                                         </div>
-                                        <div className='card d-flex align-items-center text-center p-2 rounded card1' onClick={() => change('Wastes & Plumbing',data8)}>
+                                        <div className='card d-flex align-items-center text-center p-2 rounded card1' onClick={() => change('Wastes & Plumbing')}>
                                             <img src="assets/ui/Wastes & Plumbing.png"></img>
-                                            <span className='m-2'>Wastes and Plumbing</span>
+                                            <span className='m-2'>Wastes & Plumbing</span>
                                         </div>
                                     </div>
                                 </div>
