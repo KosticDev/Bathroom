@@ -1,15 +1,15 @@
 import { initializeApp } from "firebase/app";
 
-const config = {
-    apiKey: "AIzaSyBaZVxeuMiNaAfbNE2dY5pGazBY9sJaTF4",
-    authDomain: "file-upload-97c34.firebaseapp.com",
-    databaseURL: "https://file-upload-97c34-default-rtdb.firebaseio.com",
-    projectId: "file-upload-97c34",
-    storageBucket: "file-upload-97c34.appspot.com",
-    messagingSenderId: "625626084952",
-    appId: "1:625626084952:web:ebb4826a63f951a26b3c2d",
-};
+const firebaseConfig = {
+    apiKey: "AIzaSyA_JJVHkNM_VflcGk6YEag1lNV3ImCUZ4A",
+    authDomain: "todo-app-b8081.firebaseapp.com",
+    projectId: "todo-app-b8081",
+    storageBucket: "todo-app-b8081.appspot.com",
+    messagingSenderId: "1082710353318",
+    appId: "1:1082710353318:web:d99117df9af3aac6e2db67",
+    measurementId: "G-GW0NZSZ2XM"
+  };
 
-const app = initializeApp(config);
+const app = initializeApp(firebaseConfig);
 
 export default app;

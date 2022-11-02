@@ -4,12 +4,10 @@ import { SubHeaderContent } from "./SubHeaderContent";
 
 export function SubHeader(props) {
   const {
-    show,
+    category,
+    setCategory,
     setShow,
     header,
-    setHeader,
-    categories,
-    isCategory,
     setIsCategory,
   } = props;
   const [isAllCategories, setIsAllCategories] = useState(false);
@@ -58,9 +56,9 @@ export function SubHeader(props) {
   const Theader = header;
   console.log(Theader, "DFadfadfad7r9q7ru9fdsi");
 
-  function Hchange(header) {
+  function Hchange(category) {
     setIsAllCategories(true);
-    setHeader(header);
+    setCategory(category);
   }
 
   return (
@@ -88,18 +86,15 @@ export function SubHeader(props) {
         )}
       </div>
       <div className="d-flex flex-wrap w-100 b_title">
-        <h4>{isAllCategories ? header : secondHeader}</h4>
+        <h4>{isAllCategories ? category : secondHeader}</h4>
       </div>
       {isAllCategories ? (
         <SubHeaderContent
-          categories={categories}
-          isAdd={isAdd}
-          setAdd={setAdd}
           loadBathtub={props.loadBathtub}
           loadBathtub2={props.loadBathtub2}
           loadTapware={props.loadTapware}
           shower={props.shower}
-          show={show}
+          loadModel = {props.loadModel}
           setShow={setShow}
         />
       ) : (
