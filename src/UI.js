@@ -305,7 +305,7 @@ window.addEventListener("resize", resize, false);
 
 GenerateBathroom();
 loadDoor("assets/doors/panel.glb", 1, 1);
-loadModel("assets/bathtub.glb",600,1600,400);
+loadModel("assets/bathtub.glb",1000,1800,500);
 
 animate();
 
