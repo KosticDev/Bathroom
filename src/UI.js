@@ -149,6 +149,7 @@ function init() {
 init();
 
 function initLight() {
+  const Ambientlight = new THREE.AmbientLight( "white", 0.1 ); // soft white light
   global_light = new THREE.HemisphereLight("white", "", 0.5);
   light_1 = new THREE.PointLight("white", 0.2, 20, 1);
   light_2 = new THREE.PointLight("white", 0.2, 20, 1);
@@ -158,9 +159,16 @@ function initLight() {
   light_6 = new THREE.PointLight("white", 0.2, 20, 1);
   light_7 = new THREE.PointLight("white", 0.2, 20, 1);
   light_8 = new THREE.PointLight("white", 0.2, 20, 1);
+  light_1.position.set(-5,1.2,0);
+  light_2.position.set(0,1.2,-4);
+  light_3.position.set(0,1.2,-4);
+  light_4.position.set(5,1.2,0);
+
+  //var Directionlight = new THREE.DirectionalLight("white", 0.5);
 
   scene.add(
     global_light,
+    Ambientlight,
     light_1,
     light_2,
     light_3,
@@ -297,7 +305,8 @@ window.addEventListener("resize", resize, false);
 
 GenerateBathroom();
 loadDoor("assets/doors/panel.glb", 1, 1);
-loadBathtub1();
+loadModel("assets/bathtub.glb",600,1600,400);
+
 animate();
 
 var selectedFlag = false;
@@ -1022,16 +1031,28 @@ function loadTapware(URL, num, num1, num2) {
   );
 }
 
-function loadModel(URL, width, length, height) {
-  //URL="assets/doors/bathtub.glb";
+function loadModel(URL, length, width, height) {
   gltfLoader.load(
     // resource URL
     URL,
     function (gltf) {
       model = gltf.scene;
-      console.log("model",model);
+      /*
+      model.rotation.x = -Math.PI / 2;
+      scene.add(model);
+      objects.push(model);
+      */
+      let bbox = new THREE.Box3().setFromObject(model);
+      let size = bbox.getSize(new THREE.Vector3());
+      console.log("size",size);
       
-      model.rotation.y = Math.PI / 2;
+      model.scale.x = length / relative_ratio / size.x ;
+      model.scale.y = height / relative_ratio / size.y ;
+      model.scale.z = width / relative_ratio / size.z ;
+      model.position.y =  height / relative_ratio * 0.5;
+      //model.geometry.translate(0, 0.5, 0);
+      
+      //model.rotation.y = Math.PI / 2;
       //model.children[0].material?.visible = true;
       InvisibleMat = new THREE.MeshBasicMaterial({
         color: "red",
@@ -1041,18 +1062,19 @@ function loadModel(URL, width, length, height) {
       });
       temp_model = new THREE.Mesh(
         new THREE.BoxGeometry(
-          width/1000,
-          length/1000,
-          height/1000
+          length/relative_ratio,
+          height/relative_ratio,
+          width/relative_ratio
         ),
         InvisibleMat
       );
       temp_model.userData.normalAxis = AXIS.Y;
-      tapware.children[0].material.visible = true;
+      temp_model.geometry.translate(0, height / relative_ratio * 0.5, 0);
+      //tapware.children[0].material.visible = true;
       temp_model.add(model);
       scene.add(temp_model);
       objects.push(temp_model);
-      
+      animate();
     }
   );
 }

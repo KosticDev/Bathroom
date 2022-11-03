@@ -32,7 +32,45 @@ export function SubHeaderContent(props) {
 
   return (
     <div className="d-flex flex-wrap w-100 calc">
-      <div className="card d-flex align-items-center text-center p-2 rounded card1 marr">
+      
+      {modelDatas.map((data) => {
+        return(
+        <div key={uuidv4()} className="card d-flex align-items-center text-center p-2 rounded card1 marr">
+          <span className="m-2">{data.title}</span>
+          <img
+            style={{ width: "70px", scale: "1.2" }}
+            className="m-3 p-2"
+            src={data.imageUrl}
+          ></img>
+          <div
+            className="btn m-1 rounded-5 shadow-sm"
+            onClick={() =>
+              props.loadModel(
+                data.modelUrl,
+                parseInt(data.length),
+                parseInt(data.width),
+                parseInt(data.height)
+              )
+            }
+          >
+            Add to Plan +
+          </div>
+        </div>)
+      })}
+      {localStorage.getItem("bathroom_isOwner") === "false" ? (
+        ""
+      ) : (
+        <div className="create" onClick={() => setShow(true)}>
+          <p>Create</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+
+/*
+<div className="card d-flex align-items-center text-center p-2 rounded card1 marr">
         <span className="m-2">Bath & Spas</span>
         <img
           style={{ width: "70px", scale: "1.2" }}
@@ -149,37 +187,4 @@ export function SubHeaderContent(props) {
           Add to Plan +
         </div>
       </div>
-      {modelDatas.map((data) => {
-        return(
-        <div key={uuidv4()} className="card d-flex align-items-center text-center p-2 rounded card1 marr">
-          <span className="m-2">{data.title}</span>
-          <img
-            style={{ width: "70px", scale: "1.2" }}
-            className="m-3 p-2"
-            src={data.imageUrl}
-          ></img>
-          <div
-            className="btn m-1 rounded-5 shadow-sm"
-            onClick={() =>
-              props.loadModel(
-                data.modelUrl,
-                parseInt(data.width),
-                parseInt(data.length),
-                parseInt(data.height)
-              )
-            }
-          >
-            Add to Plan +
-          </div>
-        </div>)
-      })}
-      {localStorage.getItem("bathroom_isOwner") === "false" ? (
-        ""
-      ) : (
-        <div className="create" onClick={() => setShow(true)}>
-          <p>Create</p>
-        </div>
-      )}
-    </div>
-  );
-}
+*/

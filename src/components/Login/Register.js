@@ -17,7 +17,7 @@ export default function Register() {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        var { name, password } = document.forms[0];
+        var { name, password, passwordConfirm} = document.forms[0];
 
         if (name.value === "") 
         {
@@ -42,6 +42,17 @@ export default function Register() {
             return;
         }
 
+        if (password.value !== passwordConfirm.value)
+        {
+            toastr.options = {
+                positionClass: "toast-top-right",
+                hideDuration: 300,
+                timeOut: 2000,
+              };
+              toastr.clear();
+            setTimeout(() => toastr.error(`Password does not match!`), 300);
+            return;
+        }
         let data = {
             name: name.value,
             password: password.value,
@@ -71,6 +82,9 @@ export default function Register() {
                 </div>
                 <div className="input-container">
                     <input className='textinput' type="password" name="password" required placeholder='Password' />
+                </div>
+                <div className="input-container">
+                    <input className='textinput' type="password" name="passwordConfirm" required placeholder='Confirm Password' />
                 </div>
                 <div className="button-container">
                     <input className="sumbit" type="submit" value="Register" />
