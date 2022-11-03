@@ -1048,7 +1048,7 @@ function loadModel(URL, width, length, height) {
         InvisibleMat
       );
       temp_model.userData.normalAxis = AXIS.Y;
-      // tapware.children[0].material.visible = true;
+      tapware.children[0].material.visible = true;
       temp_model.add(model);
       scene.add(temp_model);
       objects.push(temp_model);
