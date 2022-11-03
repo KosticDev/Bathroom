@@ -79,7 +79,7 @@ const mouseRemember = new THREE.Vector2();
 
 const canvas = document.createElement("canvas");
 
-const scene = new THREE.Scene();
+let scene = new THREE.Scene();
 scene.background = new THREE.Color(0x808080);
 
 const camera = new THREE.PerspectiveCamera(
@@ -94,7 +94,7 @@ function initCamera() {
   scene.add(camera);
 }
 
-initCamera();
+
 
 const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
 
@@ -111,7 +111,6 @@ function initOrbit() {
   orbitControls.minAzimuthAngle = 0.1;
 }
 
-initOrbit();
 
 const frustum = 1000;
 const orthoCam = new THREE.OrthographicCamera(
@@ -144,9 +143,24 @@ function init() {
   mapControls.screenSpacePanning = false;
   mapControls.minZoom = 100;
   mapControls.maxZoom = frustum;
+
   orthoCam.updateProjectionMatrix();
+  camera.zoom = STORE.Scale;
+  camera.updateProjectionMatrix();
 }
-init();
+
+window.addEventListener('wheel', function(event)
+{
+ if (event.deltaY < 0)
+ {
+   STORE.scale += 0.1;
+ }
+ else if (event.deltaY > 0)
+ {
+   STORE.scale -= 0.1;
+ }
+ init();
+});
 
 function initLight() {
   const Ambientlight = new THREE.AmbientLight( "white", 0.1 ); // soft white light
@@ -181,7 +195,7 @@ function initLight() {
   global_light.position.set(10, 10, 10);
 }
 
-initLight();
+
 
 // const box = new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshStandardMaterial({ side: THREE.BackSide, transparent: true, color :'white' }));
 
@@ -264,7 +278,6 @@ function isFacingCamera(object) {
   }
 }
 
-let walls;
 function animate() {
   rayWalls = [];
   for (let index = 0; index < walls_group.length; index++) {
@@ -303,11 +316,7 @@ function resize() {
 
 window.addEventListener("resize", resize, false);
 
-GenerateBathroom();
-loadDoor("assets/doors/panel.glb", 1, 1);
-loadModel("assets/bathtub.glb",1000,1800,500);
 
-animate();
 
 var selectedFlag = false;
 var temp_object = null;
@@ -1079,8 +1088,26 @@ function loadModel(URL, length, width, height) {
   );
 }
 
+const initThree = () => {
+  console.log('Hay!!');
+  objects = [];
+  scene = new THREE.Scene();
+  initCamera();
+  initOrbit();
+  init();
+  initLight();
+  GenerateBathroom();
+  loadDoor("assets/doors/panel.glb", 1, 1);
+  loadModel("assets/bathtub.glb",1000,1800,500);
+  animate();
+  console.log(objects);
+}
+initThree();
+
 const UI = observer(() => {
+  
   useEffect(() => {
+    //initThree();
     resize();
   }, []);
 
@@ -1208,7 +1235,6 @@ const UI = observer(() => {
 
   useEffect(() => {
     const database = readData();
-    console.log(database);
   }, []);
 
   const saveData = async () => {
@@ -1252,11 +1278,9 @@ const UI = observer(() => {
     setHeader(title);
   }
 
-  Update();
-
   return (
     <div className="container vh-100 overflow-auto">
-      <Navbar />
+      <Navbar init = {initThree} />
       <Sidebar
         menuOption={menuOption}
         setMenuOption={setMenuOption}

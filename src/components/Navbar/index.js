@@ -1,7 +1,7 @@
 import "./index.css"
 import { Link, useNavigate } from 'react-router-dom'
 
-const Navbar = () => {
+const Navbar = ( props ) => {
     const navigate = useNavigate();
 
     const handleClick = (e) => {
@@ -9,6 +9,7 @@ const Navbar = () => {
         localStorage.setItem("bathroom_login", false);
         localStorage.setItem("bathroom_isOwner", false);
         navigate('/login');
+        props.init();
     }
     return <div className='header'>
         <div className="d-flex justify-content-between p-2  h-100">
