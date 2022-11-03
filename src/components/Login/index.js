@@ -11,6 +11,14 @@ export default function Login() {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const navigate = useNavigate();
 
+    if (localStorage.getItem("bathroom_login") === "true") 
+    {
+        console.log("hay");
+        //navigate('/');
+        window.location.href="/";
+        //window.location.reload();
+    }
+
     const handleSubmit = async (event) => {
         event.preventDefault();
 
@@ -32,7 +40,7 @@ export default function Login() {
                 else localStorage.setItem("bathroom_isOwner", false);
             }
         });
-        if (localStorage.getItem("bathroom_login") === "true") {navigate('/'); return;}
+        if (localStorage.getItem("bathroom_login") === "true") {window.location.href="/"; return;}
 
         toastr.options = {
             positionClass: "toast-top-right",
