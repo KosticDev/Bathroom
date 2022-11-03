@@ -1030,8 +1030,9 @@ function loadModel(URL, width, length, height) {
     function (gltf) {
       model = gltf.scene;
       console.log("model",model);
+      
       model.rotation.y = Math.PI / 2;
-      model.children[0].material.visible = true;
+      //model.children[0].material?.visible = true;
       InvisibleMat = new THREE.MeshBasicMaterial({
         color: "red",
         visible: false,
