@@ -1,14 +1,17 @@
 import './login.css'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection, addDoc, getDocs } from "firebase/firestore";
 import { db } from "../Firebase/firebaseConfig";
 
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
-export default function Login() {
 
+export default function Register() {
+
+    const [errorMessages, setErrorMessages] = useState({});
     const [isSubmitted, setIsSubmitted] = useState(false);
+
     const navigate = useNavigate();
 
     const handleSubmit = async (event) => {
@@ -16,33 +19,48 @@ export default function Login() {
 
         var { name, password } = document.forms[0];
 
-        const q = query(collection(db, "user_data"));
+        if (name.value === "") 
+        {
+            toastr.options = {
+                positionClass: "toast-top-right",
+                hideDuration: 300,
+                timeOut: 2000,
+              };
+              toastr.clear();
+            setTimeout(() => toastr.error(`Insert User Name!`), 300);
+            return;
+        }
+        if (password.value === "") 
+        {
+            toastr.options = {
+                positionClass: "toast-top-right",
+                hideDuration: 300,
+                timeOut: 2000,
+              };
+              toastr.clear();
+            setTimeout(() => toastr.error(`Insert User Password!`), 300);
+            return;
+        }
 
-        
-        const querySnapshot = await getDocs(q);
-        querySnapshot.forEach((doc) => {
-            // doc.data() is never undefined for query doc snapshots
-            console.log(doc.id, " => ", doc.data());
-            let data = doc.data();
-            if (data.name === name.value && data.password === password.value)
-            {
-                localStorage.setItem("bathroom_login", true);
-                console.log(data.isOwner);
-                if (data.isOwner === 1) localStorage.setItem("bathroom_isOwner", true);
-                else localStorage.setItem("bathroom_isOwner", false);
-            }
-        });
-        if (localStorage.getItem("bathroom_login") === "true") {navigate('/'); return;}
+        let data = {
+            name: name.value,
+            password: password.value,
+            isOwner: 0
+        }
+        const docRef = await addDoc(collection(db, "user_data"), data);
+
+        console.log("Document written with ID: ", docRef.id);
 
         toastr.options = {
-            positionClass: "toast-top-right",
-            hideDuration: 300,
-            timeOut: 2000,
+          positionClass: "toast-top-right",
+          hideDuration: 300,
+          timeOut: 2000,
         };
         toastr.clear();
-        setTimeout(() => toastr.error(`Username and password not correct`), 300);
-        //navigate('/');
-        // Find user login info
+        setTimeout(() => toastr.success(`Sucessfully done`), 300);
+
+        navigate('/login');
+        // Compare user info
     };
 
     const renderForm = (
@@ -55,7 +73,7 @@ export default function Login() {
                     <input className='textinput' type="password" name="password" required placeholder='Password' />
                 </div>
                 <div className="button-container">
-                    <input className="sumbit" type="submit" value="Login" />
+                    <input className="sumbit" type="submit" value="Register" />
                 </div>
             </form>
         </div>
@@ -73,7 +91,7 @@ export default function Login() {
                         <img src='./logo3.png' alt="" />
                         <div className='left_page_cotent'>
                             <h2>Welcome</h2>
-                            <p>Login to your account below</p>
+                            <p>Register your account below</p>
                             {isSubmitted ? <div>User is successfully logged in</div> : renderForm}
                         </div>
                     </div>
@@ -93,7 +111,7 @@ export default function Login() {
                                 <li>Save and get a quote on your design.</li>
                                 <li>See your past purchases</li>
                             </ul>
-                            <Link to='/register'>Register now</Link>
+                            <Link to='/login'>Login now</Link>
                         </div>
                     </div>
                 </div>

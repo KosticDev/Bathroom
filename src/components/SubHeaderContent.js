@@ -173,7 +173,7 @@ export function SubHeaderContent(props) {
           </div>
         </div>)
       })}
-      {create ? (
+      {localStorage.getItem("bathroom_isOwner") === "false" ? (
         ""
       ) : (
         <div className="create" onClick={() => setShow(true)}>
