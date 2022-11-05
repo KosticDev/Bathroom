@@ -1055,10 +1055,10 @@ function loadModel(URL, length, width, height) {
       let size = bbox.getSize(new THREE.Vector3());
       console.log("size",size);
       
-      model.scale.x = length / relative_ratio / size.x ;
-      model.scale.y = height / relative_ratio / size.y ;
-      model.scale.z = width / relative_ratio / size.z ;
-      model.position.y =  height / relative_ratio * 0.5;
+      //model.scale.x = length / relative_ratio / size.x ;
+      //model.scale.y = height / relative_ratio / size.y ;
+      //model.scale.z = width / relative_ratio / size.z ;
+      model.position.y =  size.y* 0.5;
       //model.geometry.translate(0, 0.5, 0);
       
       //model.rotation.y = Math.PI / 2;
@@ -1071,14 +1071,14 @@ function loadModel(URL, length, width, height) {
       });
       temp_model = new THREE.Mesh(
         new THREE.BoxGeometry(
-          length/relative_ratio,
-          height/relative_ratio,
-          width/relative_ratio
+          size.x,
+          size.y,
+          size.z
         ),
         InvisibleMat
       );
       temp_model.userData.normalAxis = AXIS.Y;
-      temp_model.geometry.translate(0, height / relative_ratio * 0.5, 0);
+      temp_model.geometry.translate(0, size.y * 0.5, 0);
       //tapware.children[0].material.visible = true;
       temp_model.add(model);
       scene.add(temp_model);
