@@ -31,7 +31,7 @@ body {
 .roomsSideBar {
   position: fixed;
   height: 100%;
-  width: 380px;
+  width: 450px;
   top: 60px;
   left: 50px;
   background: rgb(250, 247, 247);
@@ -349,7 +349,7 @@ h6:hover {
   align-items: center;
   border: 2px solid #aaa;
   gap: 30px;
-  width: 40%;
+  width: 80%;
   margin-left: auto;
   margin-right: auto;
   padding: 20px;
@@ -361,7 +361,7 @@ h6:hover {
 }
 
 .image_info>label>input {
-  width: 100px !important;
+  width: 300px !important;
 }
 
 .rounded {

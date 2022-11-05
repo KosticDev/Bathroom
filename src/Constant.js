@@ -47,6 +47,7 @@ export const STORE = observable({
     walls: [],
     view: 0,
     scale : 1,
+    change : 0,
 
     get CutOutLength() {
         return this.clength * .001;
@@ -70,7 +71,12 @@ export const STORE = observable({
     get Scale() {
 
         return this.scale;
-    }
+    },
+
+    get Change() {
+        return this.change;
+    },
+
 
 });
 

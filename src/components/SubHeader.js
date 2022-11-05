@@ -11,7 +11,6 @@ export function SubHeader(props) {
     setIsCategory,
   } = props;
   const [isAllCategories, setIsAllCategories] = useState(false);
-  const { isAdd, setAdd } = useState(false);
   const [secondHeader, setSecondHeader] = useState(header);
   let subCategoryData = [];
 
@@ -90,12 +89,11 @@ export function SubHeader(props) {
       </div>
       {isAllCategories ? (
         <SubHeaderContent
-          loadBathtub={props.loadBathtub}
-          loadBathtub2={props.loadBathtub2}
-          loadTapware={props.loadTapware}
-          shower={props.shower}
           loadModel = {props.loadModel}
           setShow={setShow}
+          category= {header}
+          subCategory= {category}
+          keyRefresh = {props.keyRefresh}
         />
       ) : (
         <div className="d-flex flex-wrap w-100">

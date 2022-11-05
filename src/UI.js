@@ -30,6 +30,8 @@ import storage from "./components/Firebase/firebaseConfig";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import CreateDate from "./components/Firebase/Create";
 import { readData } from "./components/Firebase/Read";
+import { update } from "firebase/database";
+import { savePositionData, clearPositionData, getPositionData } from "./utils/cacheData";
 
 const Room_types = [1, 2, 3, 4, 5, 6];
 const relative_ratio = 1000;
@@ -135,6 +137,7 @@ var light_8;
 
 function init() {
   // const orthoCam = new THREE.OrthographicCamera(-frustum, frustum, frustum, -frustum, 0, 30);
+  console.log("I am here!");
   orthoCam.zoom = STORE.Scale * 100;
   mapControls = new MapControls(orthoCam, labelRenderer.domElement);
 
@@ -158,8 +161,10 @@ window.addEventListener('wheel', function(event)
  else if (event.deltaY > 0)
  {
    STORE.scale -= 0.1;
+   //STORE.Scale -= 0.1;
  }
  init();
+ GenerateMeasurements();
 });
 
 function initLight() {
@@ -341,6 +346,8 @@ const onmousedown = (e) => {
 
   if (objectIntersects.length > 0 && isMouseDown) {
     selectedItem = objectIntersects[0].object;
+    console.log("Mouse Down", selectedItem);
+    savePositionData(0, selectedItem);
     orbitControls.enabled = false;
   }
 };
@@ -349,6 +356,11 @@ const onmouseup = (e) => {
   isMouseDown = false;
   isDrag = false;
   orbitControls.enabled = true;
+  if (selectedItem !== null )
+  {
+    console.log("Mouse Up", selectedItem);
+    savePositionData(1, selectedItem);
+  }
   selectedItem = null;
 
   var objectIntersects = raycaster.intersectObjects(objects);
@@ -1040,7 +1052,7 @@ function loadTapware(URL, num, num1, num2) {
   );
 }
 
-function loadModel(URL, length, width, height) {
+function loadModel(URL) {
   gltfLoader.load(
     // resource URL
     URL,
@@ -1108,8 +1120,17 @@ const UI = observer(() => {
   
   useEffect(() => {
     //initThree();
+    clearPositionData();
     resize();
   }, []);
+
+  useEffect(() => {
+    let current_position = localStorage.getItem('current_position');
+    if (current_position === null) current_position = -1;
+    else current_position = parseInt(current_position);
+    setPosition(current_position);
+    setCurrentPosition(current_position);
+  }, [STORE.Change]);
 
   const [menuOption, setMenuOption] = useState([
     false,
@@ -1132,11 +1153,13 @@ const UI = observer(() => {
   const [imageURL, setImageURL] = useState();
   const [modelURL, setModelURL] = useState();
   const [title, setTitle] = useState("");
-  const [inputLength, setInputLength] = useState(0);
-  const [inputWidth, setInputWidth] = useState(0);
-  const [inputHeight, setInputHeight] = useState(0);
+  const [position, setPosition] = useState(-1);
+  const [currentPosition, setCurrentPosition] = useState(-1);
+
   const [header, setHeader] = useState("");
   const [category, setCategory] = useState("");
+
+  const [uploadCount, setUploadCount] = useState(0);
 
   function AssignVal(e) {
     STORE[e.target.id] = e.target.value;
@@ -1221,30 +1244,39 @@ const UI = observer(() => {
     setTitle(e.target.value);
   }
 
-  function onChangeLength(e) {
-    setInputLength(e.target.value);
-  }
-
-  function onChangeHeight(e) {
-    setInputHeight(e.target.value);
-  }
-
-  function onChangeWidth(e) {
-    setInputWidth(e.target.value);
-  }
-
-  useEffect(() => {
-    const database = readData();
-  }, []);
 
   const saveData = async () => {
+    let errorMessage = "";
+    if (title === "")
+    {
+      errorMessage = "Please insert title!";
+    }
+
+    if (percent1 !== 100)
+    {
+      errorMessage = "Please upload 3D model file!";
+    }
+
+    if (percent !== 100)
+    {
+      errorMessage = "Please upload image file!";
+    }
+
+    if (errorMessage !== "")
+    {
+      toastr.options = {
+        positionClass: "toast-top-right",
+        hideDuration: 300,
+        timeOut: 2000,
+      };
+      toastr.clear();
+      setTimeout(() => toastr.error(errorMessage), 300);
+    }
+
     const data = {
       imageUrl: imageURL,
       modelUrl: modelURL,
       title: title,
-      length: inputLength,
-      width: inputWidth,
-      height: inputHeight,
       category: header,
       subCategory: category,
     };
@@ -1265,9 +1297,11 @@ const UI = observer(() => {
       setTitle("");
       setImageURL("");
       setModelURL("");
-      setInputHeight(0);
-      setInputWidth(0);
-      setInputLength(0);
+      setPercent(0);
+      setPercent1(0);
+      setFile("");
+      setFile1("");
+      setUploadCount(uploadCount + 1);
     } catch (e) {
       console.error("Error adding document: ", e);
     }
@@ -1278,6 +1312,32 @@ const UI = observer(() => {
     setHeader(title);
   }
 
+  function handleRemember(e, flag)
+  {
+    e.preventDefault();
+    let positionData; 
+    let positionVector;
+    if (flag === 0 )
+    {
+      if (currentPosition === -1) return;
+      positionData = getPositionData(currentPosition);
+      positionVector = positionData.from;
+      localStorage.setItem('current_position', currentPosition - 1);
+      setCurrentPosition(currentPosition - 1);
+    }
+    if (flag === 1 )
+    {
+      if (currentPosition === position) return;
+      positionData = getPositionData(currentPosition+1);
+      positionVector = positionData.to;
+      localStorage.setItem('current_position', currentPosition + 1);
+      setCurrentPosition(currentPosition + 1);
+    }
+    let selectedObject = scene.getObjectByProperty( 'uuid', positionData.uuid);
+    selectedObject.position.x = positionVector.x;
+    selectedObject.position.y = positionVector.y;
+    selectedObject.position.z = positionVector.z;
+  }
   return (
     <div className="container vh-100 overflow-auto">
       <Navbar init = {initThree} />
@@ -1289,7 +1349,7 @@ const UI = observer(() => {
       <div className="row content">
         <div
           className="roomsSideBar"
-          style={{ marginLeft: menuOption[0] && !isCategory ? 0 : -400 }}
+          style={{ marginLeft: menuOption[0] && !isCategory ? 0 : -470 }}
         >
           <div className="d-flex r_title border-bottom">
             <h6
@@ -1448,7 +1508,7 @@ const UI = observer(() => {
 
         <div
           className="roomsSideBar"
-          style={{ marginLeft: menuOption[1] && !isCategory ? 0 : -400 }}
+          style={{ marginLeft: menuOption[1] && !isCategory ? 0 : -470 }}
         >
           <div className="d-flex r_title border-bottom">
             <h6
@@ -1546,7 +1606,7 @@ const UI = observer(() => {
 
         <div
           className="roomsSideBar"
-          style={{ marginLeft: menuOption[2] ? 0 : -400 }}
+          style={{ marginLeft: menuOption[2] ? 0 : -470 }}
         >
           <div className="d-flex r_title border-bottom">
             <h6
@@ -1569,6 +1629,7 @@ const UI = observer(() => {
               header={header}
               category={category}
               setCategory={setCategory}
+              keyRefresh = {uploadCount}
             />
           ) : (
             <>
@@ -1579,8 +1640,8 @@ const UI = observer(() => {
                 style={{ height: 40, border: "none" }}
               />
               <div className="main_window">
-                <div className="d-flex flex-wrap w-100">
-                  <div className="d-flex flex-wrap w-100 cards">
+                <div className="d-flex flex-wrap w-140">
+                  <div className="d-flex flex-wrap w-140 cards">
                     <div
                       className="card  d-flex align-items-center text-center p-2 rounded card1"
                       onClick={() => change("Baths & Spas")}
@@ -1597,8 +1658,8 @@ const UI = observer(() => {
                     </div>
                   </div>
                 </div>
-                <div className="d-flex flex-wrap w-100">
-                  <div className="d-flex flex-wrap w-100 cards">
+                <div className="d-flex flex-wrap w-140">
+                  <div className="d-flex flex-wrap w-140 cards">
                     <div
                       className="card  d-flex align-items-center text-center p-2 rounded card1"
                       onClick={() => change("Shavers & Mirrors")}
@@ -1615,8 +1676,8 @@ const UI = observer(() => {
                     </div>
                   </div>
                 </div>
-                <div className="d-flex flex-wrap w-100">
-                  <div className="d-flex flex-wrap w-100 cards">
+                <div className="d-flex flex-wrap w-140">
+                  <div className="d-flex flex-wrap w-140 cards">
                     <div
                       className="card  d-flex align-items-center text-center p-2 rounded card1"
                       onClick={() => change("Showers")}
@@ -1633,8 +1694,8 @@ const UI = observer(() => {
                     </div>
                   </div>
                 </div>
-                <div className="d-flex flex-wrap w-100">
-                  <div className="d-flex flex-wrap w-100 cards">
+                <div className="d-flex flex-wrap w-140">
+                  <div className="d-flex flex-wrap w-140 cards">
                     <div
                       className="card  d-flex align-items-center text-center p-2 rounded card1"
                       onClick={() => change("Toilets")}
@@ -1658,7 +1719,7 @@ const UI = observer(() => {
 
         <div
           className="roomsSideBar"
-          style={{ marginLeft: menuOption[3] && !isCategory ? 0 : -400 }}
+          style={{ marginLeft: menuOption[3] && !isCategory ? 0 : -470 }}
         >
           <div className="d-flex r_title border-bottom">
             <h6
@@ -1740,7 +1801,7 @@ const UI = observer(() => {
 
         <div
           className="roomsSideBar"
-          style={{ marginLeft: menuOption[4] && !isCategory ? 0 : -400 }}
+          style={{ marginLeft: menuOption[4] && !isCategory ? 0 : -470 }}
         >
           <div className="d-flex r_title border-bottom">
             <h6
@@ -1755,7 +1816,7 @@ const UI = observer(() => {
 
         <div
           className="roomsSideBar"
-          style={{ marginLeft: menuOption[5] && !isCategory ? 0 : -400 }}
+          style={{ marginLeft: menuOption[5] && !isCategory ? 0 : -470 }}
         >
           <div className="d-flex r_title border-bottom">
             <h6
@@ -1770,7 +1831,7 @@ const UI = observer(() => {
 
         <div
           className="roomsSideBar"
-          style={{ marginLeft: menuOption[6] && !isCategory ? 0 : -400 }}
+          style={{ marginLeft: menuOption[6] && !isCategory ? 0 : -470 }}
         >
           <div className="d-flex r_title border-bottom">
             <h6
@@ -1854,14 +1915,16 @@ const UI = observer(() => {
               <img
                 className="d-block shadow-focus btn p-2 bg-light  m-3 rounded-1 radius1"
                 src="assets/ui/back.png"
-                style={{ width: "37px" }}
+                style={{ width: "37px", opacity: `${currentPosition > -1? '1' : '0.5'}` }}
                 alt=""
+                onClick={(e) => handleRemember(e, 0)}
               />
               <img
                 className="d-block shadow-focus btn p-2 bg-light  m-3 rounded-1 radius1"
                 src="assets/ui/forward.png"
-                style={{ width: "37px" }}
+                style={{ width: "37px", opacity: `${position > currentPosition? '1' : '0.5'}` }}
                 alt=""
+                onClick={(e) => handleRemember(e, 1)}
               />
             </div>
           </div>
@@ -1899,33 +1962,6 @@ const UI = observer(() => {
                       type="text"
                       value={title}
                       onChange={onChangeTitle}
-                      required
-                    />
-                  </label>
-                  <label>
-                    Length:&nbsp;
-                    <input
-                      type="number"
-                      value={inputLength}
-                      onChange={onChangeLength}
-                      required
-                    />
-                  </label>
-                  <label>
-                    Width:&nbsp;
-                    <input
-                      type="number"
-                      value={inputWidth}
-                      onChange={onChangeWidth}
-                      required
-                    />
-                  </label>
-                  <label>
-                    Height:&nbsp;
-                    <input
-                      type="number"
-                      value={inputHeight}
-                      onChange={onChangeHeight}
                       required
                     />
                   </label>
