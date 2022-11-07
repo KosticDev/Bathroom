@@ -56,6 +56,8 @@ let temp_shower = null;
 let model;
 let temp_model;
 
+let obtainedObjectColor = null;
+
 let dims = [];
 
 let isMouseDown = false;
@@ -166,7 +168,7 @@ window.addEventListener("wheel", function (event) {
     if (rect.right > maxWidth) maxWidth = rect.right;
   }
   if (maxWidth > event.x) return;
-  
+
   if (event.deltaY < 0) {
     STORE.scale += 0.1;
   } else if (event.deltaY > 0) {
@@ -235,10 +237,12 @@ function DragObject(vec3, object, selectedwall) {
   let ow = object.geometry.parameters.width / 2;
   let oz = object.geometry.parameters.depth / 2;
   let oy = object.geometry.parameters.height;
+  if (object.userData.type === "door") oz = 0;
 
   switch (selectedwall.userData.normalAxis) {
     case AXIS.X:
       object.userData.normalAxis = AXIS.X;
+
       if (selectedwall.userData.dir == DIR.START) {
         object.rotation.y = Math.PI / 2;
         object.userData.dir = DIR.START;
@@ -357,6 +361,32 @@ const onmousedown = (e) => {
   }
 };
 
+function getObjectColor(object) {
+  if (object.material !== undefined && object.material.color !== undefined )
+  {
+    if (object.userData.type !== 'door' && obtainedObjectColor === null)
+    {
+      obtainedObjectColor = object.material.color;
+    }
+  }
+  console.log(object);
+  if (object.children !== []) {
+    console.log(object.children.length);
+    for (let i = 0; i < object.children.length; i++) {
+      getObjectColor(object.children[i]);
+    }
+  }
+}
+
+function componentToHex(c) {
+  var hex = c.toString(16);
+  return hex.length == 1 ? "0" + hex : hex;
+}
+
+function rgbToHex(r, g, b) {
+  return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+}
+
 const onmouseup = (e) => {
   isMouseDown = false;
   isDrag = false;
@@ -383,11 +413,24 @@ const onmouseup = (e) => {
     }
     temp_object = hoverItem;
     temp_object_real = objectIntersects[1].object;
+
     $(".functionBoard").css({ display: "block" });
+    if (temp_object.userData.type === 'door')
+    {
+      console.log(temp_object);
+      getObjectColor(temp_object);
+      let redColor = parseInt(255 * obtainedObjectColor.r);
+      let greenColor = parseInt(255 * obtainedObjectColor.g);
+      let blueColor = parseInt(255 * obtainedObjectColor.b);
+      $(".colorBoard").css({ display: "block" });
+      document.getElementsByClassName('colorBoard')[0].value = rgbToHex(redColor, greenColor, blueColor);
+      obtainedObjectColor = null;
+    }
   } else if (hoverItem && !isDrag) {
     hoverItem.material.visible = false;
     selectedFlag = false;
     $(".functionBoard").css({ display: "none" });
+    $(".colorBoard").css({ display: "none" });
   }
 
   Update();
@@ -424,11 +467,22 @@ $("body").keydown(function (event) {
 
 function deleteObject() {
   if (temp_object_real != null) {
+    temp_object.parent.remove(temp_object);
+    /*
     temp_object.visible = false;
     temp_object_real.visible = false;
-
     temp_object_real = null;
+    */
   }
+}
+
+function changeColor(e) {
+  e.preventDefault();
+  let hexColor = document.getElementsByClassName('colorBoard')[0].value;
+  hexColor = hexColor.slice(1);
+  var aRgbHex = hexColor.match(/.{1,2}/g);
+  let objColor = { r: parseInt(aRgbHex[0], 16)/255, g: parseInt(aRgbHex[1], 16)/255, b: parseInt(aRgbHex[2], 16)/255, isColor: true };
+  objectTraverse(temp_object, objColor)
 }
 
 window.addEventListener("mousemove", onmousemove);
@@ -445,7 +499,7 @@ function Update() {
 }
 
 function createWalls(type, material) {
-  console.log('material: ', material);
+  console.log("material: ", material);
   for (let index = 0; index < walls_group.length; index++) {
     scene.remove(walls_group[index]);
   }
@@ -867,7 +921,18 @@ function GenerateMeasurements() {
     );
 }
 
-function loadDoor(url, num, num1) {
+function objectTraverse(object, objColor) {
+  if (object.material !== undefined && object.material.color !== undefined)
+    object.material.color = objColor;
+
+  if (object.children !== []) {
+    for (let i = 0; i < object.children.length; i++) {
+      objectTraverse(object.children[i], objColor);
+    }
+  }
+}
+
+function loadDoor(url, num, num1, objColor) {
   gltfLoader.load(
     // resource URL
     url,
@@ -892,10 +957,16 @@ function loadDoor(url, num, num1) {
       temp_door.userData.normalAxis = AXIS.Z;
       temp_door.userData.normalVector = new Vector3(0, 0, 1);
       temp_door.userData.dir = DIR.START;
+      temp_door.userData.type = "door";
       door = gltf.scene;
       door.scale.x = num;
       door.scale.y = num;
       door.scale.z = num / 2;
+
+      //let objColor = { r: 1, g: 0, b: 0, isColor: true };
+      if (objColor !== undefined && objColor !==null)
+        objectTraverse(door, objColor);
+
       temp_door.add(door);
       scene.add(temp_door);
       objects.push(temp_door);
@@ -1119,7 +1190,7 @@ function loadModel(URL) {
     URL,
     function (gltf) {
       model = gltf.scene;
-      console.log("insert",model);
+      console.log("insert", model);
       /*
       model.rotation.x = -Math.PI / 2;
       scene.add(model);
@@ -1822,7 +1893,14 @@ const UI = observer(() => {
                     200x200mm
                   </span>
                   <div className="hover1">
-                    <p onClick = {(e) => {e.preventDefault(); STORE.material = 0}}>+</p>
+                    <p
+                      onClick={(e) => {
+                        e.preventDefault();
+                        STORE.material = 0;
+                      }}
+                    >
+                      +
+                    </p>
                   </div>
                 </div>
                 <div
@@ -1840,7 +1918,14 @@ const UI = observer(() => {
                     200x200mm
                   </span>
                   <div className="hover1">
-                    <p onClick = {(e) => {e.preventDefault(); STORE.material = 1}}>+</p>
+                    <p
+                      onClick={(e) => {
+                        e.preventDefault();
+                        STORE.material = 1;
+                      }}
+                    >
+                      +
+                    </p>
                   </div>
                 </div>
                 <div
@@ -1858,7 +1943,14 @@ const UI = observer(() => {
                     200x200mm
                   </span>
                   <div className="hover1">
-                    <p onClick = {(e) => {e.preventDefault(); STORE.material = 2}}>+</p>
+                    <p
+                      onClick={(e) => {
+                        e.preventDefault();
+                        STORE.material = 2;
+                      }}
+                    >
+                      +
+                    </p>
                   </div>
                 </div>
               </div>
@@ -1938,6 +2030,26 @@ const UI = observer(() => {
             >
               <i className="fa fa-trash"></i>
             </div>
+            <input
+              className="colorBoard"
+              type="color"
+              id="objectColor"
+              name="objectColor"
+              style={{
+                width: "40px",
+                height: "40px",
+                padding: "10px",
+                borderRadius: "40px",
+                position: "absolute",
+                top: "10%",
+                left: "45%",
+                cursor: "pointer",
+                display: "none",
+              }}
+              onChange={(e) => {
+                changeColor(e);
+              }}
+            ></input>
           </div>
           <div
             className="rightSideBar"
