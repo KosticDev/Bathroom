@@ -48,6 +48,11 @@ export const STORE = observable({
     view: 0,
     scale : 1,
     change : 0,
+    material : 1,
+
+    get Material() {
+        return this.material;
+    },
 
     get CutOutLength() {
         return this.clength * .001;

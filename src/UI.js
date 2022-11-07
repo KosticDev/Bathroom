@@ -197,7 +197,6 @@ function initLight() {
 
   scene.add(
     global_light,
-    Ambientlight,
     light_1,
     light_2,
     light_3,
@@ -445,7 +444,8 @@ function Update() {
   }, 5);
 }
 
-function createWalls(type) {
+function createWalls(type, material) {
+  console.log('material: ', material);
   for (let index = 0; index < walls_group.length; index++) {
     scene.remove(walls_group[index]);
   }
@@ -458,7 +458,9 @@ function createWalls(type) {
           STORE.Height,
           new Vector3(-STORE.Width / 2, 0, 0),
           AXIS.X,
-          DIR.START
+          DIR.START,
+          null,
+          material
         )
       );
       walls_group.push(
@@ -467,7 +469,9 @@ function createWalls(type) {
           STORE.Height,
           new Vector3(STORE.Width / 2, 0, 0),
           AXIS.X,
-          DIR.END
+          DIR.END,
+          null,
+          material
         )
       );
       walls_group.push(
@@ -476,7 +480,9 @@ function createWalls(type) {
           STORE.Height,
           new Vector3(0, 0, -STORE.Length / 2),
           AXIS.Z,
-          DIR.START
+          DIR.START,
+          null,
+          material
         )
       );
       walls_group.push(
@@ -485,7 +491,9 @@ function createWalls(type) {
           STORE.Height,
           new Vector3(0, 0, STORE.Length / 2),
           AXIS.Z,
-          DIR.END
+          DIR.END,
+          null,
+          material
         )
       );
       break;
@@ -496,7 +504,9 @@ function createWalls(type) {
           STORE.Height,
           new Vector3(-STORE.Width / 2, 0, 0),
           AXIS.X,
-          DIR.START
+          DIR.START,
+          null,
+          material
         )
       );
       walls_group.push(
@@ -505,7 +515,9 @@ function createWalls(type) {
           STORE.Height,
           new Vector3(STORE.Width / 2, 0, -STORE.CutOutLength / 2),
           AXIS.X,
-          DIR.END
+          DIR.END,
+          null,
+          material
         )
       );
       walls_group.push(
@@ -514,7 +526,9 @@ function createWalls(type) {
           STORE.Height,
           new Vector3(0, 0, -STORE.Length / 2),
           AXIS.Z,
-          DIR.START
+          DIR.START,
+          null,
+          material
         )
       );
       walls_group.push(
@@ -523,7 +537,9 @@ function createWalls(type) {
           STORE.Height,
           new Vector3(-STORE.CutOutWidth / 2, 0, STORE.Length / 2),
           AXIS.Z,
-          DIR.END
+          DIR.END,
+          null,
+          material
         )
       );
       walls_group.push(
@@ -536,7 +552,9 @@ function createWalls(type) {
             STORE.Length / 2 - STORE.CutOutLength
           ),
           AXIS.Z,
-          DIR.END
+          DIR.END,
+          null,
+          material
         )
       );
       walls_group.push(
@@ -549,7 +567,9 @@ function createWalls(type) {
             STORE.Length / 2 - STORE.CutOutLength / 2
           ),
           AXIS.X,
-          DIR.END
+          DIR.END,
+          null,
+          material
         )
       );
       break;
@@ -561,7 +581,8 @@ function createWalls(type) {
           new Vector3(-STORE.Width / 2, 0, -STORE.CutOutLength / 2),
           AXIS.X,
           DIR.START,
-          true
+          true,
+          material
         )
       );
       walls_group.push(
@@ -571,7 +592,8 @@ function createWalls(type) {
           new Vector3(STORE.Width / 2, 0, 0),
           AXIS.X,
           DIR.END,
-          false
+          false,
+          material
         )
       );
       walls_group.push(
@@ -581,7 +603,8 @@ function createWalls(type) {
           new Vector3(0, 0, -STORE.Length / 2),
           AXIS.Z,
           DIR.START,
-          false
+          false,
+          material
         )
       );
       walls_group.push(
@@ -591,7 +614,8 @@ function createWalls(type) {
           new Vector3(STORE.CutOutWidth / 2, 0, STORE.Length / 2),
           AXIS.Z,
           DIR.END,
-          true
+          true,
+          material
         )
       );
       walls_group.push(
@@ -604,7 +628,9 @@ function createWalls(type) {
             STORE.Length / 2 - STORE.CutOutLength
           ),
           AXIS.Z,
-          DIR.END
+          DIR.END,
+          null,
+          material
         )
       );
       walls_group.push(
@@ -617,7 +643,9 @@ function createWalls(type) {
             STORE.Length / 2 - STORE.CutOutLength / 2
           ),
           AXIS.X,
-          DIR.START
+          DIR.START,
+          null,
+          material
         )
       );
       break;
@@ -628,7 +656,9 @@ function createWalls(type) {
           STORE.Height,
           new Vector3(-STORE.Width / 2, 0, 0),
           AXIS.X,
-          DIR.START
+          DIR.START,
+          null,
+          material
         )
       );
       walls_group.push(
@@ -637,7 +667,9 @@ function createWalls(type) {
           STORE.Height,
           new Vector3(STORE.Width / 2, 0, STORE.CutOutLength / 2),
           AXIS.X,
-          DIR.END
+          DIR.END,
+          null,
+          material
         )
       );
       walls_group.push(
@@ -646,7 +678,9 @@ function createWalls(type) {
           STORE.Height,
           new Vector3(-STORE.CutOutWidth / 2, 0, -STORE.Length / 2),
           AXIS.Z,
-          DIR.START
+          DIR.START,
+          null,
+          material
         )
       );
       walls_group.push(
@@ -655,7 +689,9 @@ function createWalls(type) {
           STORE.Height,
           new Vector3(0, 0, STORE.Length / 2),
           AXIS.Z,
-          DIR.END
+          DIR.END,
+          null,
+          material
         )
       );
       walls_group.push(
@@ -668,7 +704,9 @@ function createWalls(type) {
             -STORE.Length / 2 + STORE.CutOutLength
           ),
           AXIS.Z,
-          DIR.START
+          DIR.START,
+          null,
+          material
         )
       );
       walls_group.push(
@@ -681,7 +719,9 @@ function createWalls(type) {
             -STORE.Length / 2 + STORE.CutOutLength / 2
           ),
           AXIS.X,
-          DIR.END
+          DIR.END,
+          null,
+          material
         )
       );
       break;
@@ -692,7 +732,9 @@ function createWalls(type) {
           STORE.Height,
           new Vector3(-STORE.Width / 2, 0, STORE.CutOutLength / 2),
           AXIS.X,
-          DIR.START
+          DIR.START,
+          null,
+          material
         )
       );
       walls_group.push(
@@ -701,7 +743,9 @@ function createWalls(type) {
           STORE.Height,
           new Vector3(STORE.Width / 2, 0, 0),
           AXIS.X,
-          DIR.END
+          DIR.END,
+          null,
+          material
         )
       );
       walls_group.push(
@@ -710,7 +754,9 @@ function createWalls(type) {
           STORE.Height,
           new Vector3(STORE.CutOutWidth / 2, 0, -STORE.Length / 2),
           AXIS.Z,
-          DIR.START
+          DIR.START,
+          null,
+          material
         )
       );
       walls_group.push(
@@ -719,7 +765,9 @@ function createWalls(type) {
           STORE.Height,
           new Vector3(0, 0, STORE.Length / 2),
           AXIS.Z,
-          DIR.END
+          DIR.END,
+          null,
+          material
         )
       );
       walls_group.push(
@@ -732,7 +780,9 @@ function createWalls(type) {
             -STORE.Length / 2 + STORE.CutOutLength
           ),
           AXIS.Z,
-          DIR.START
+          DIR.START,
+          null,
+          material
         )
       );
       walls_group.push(
@@ -745,7 +795,9 @@ function createWalls(type) {
             -STORE.Length / 2 + STORE.CutOutLength / 2
           ),
           AXIS.X,
-          DIR.START
+          DIR.START,
+          null,
+          material
         )
       );
       break;
@@ -758,7 +810,9 @@ function createWalls(type) {
       AXIS.Y,
       DIR.START,
       STORE.type,
-      STORE.view
+      STORE.view,
+      null,
+      material
     )
   );
   walls_group.push(
@@ -767,7 +821,9 @@ function createWalls(type) {
       AXIS.Y,
       DIR.END,
       STORE.type,
-      STORE.view
+      STORE.view,
+      null,
+      material
     )
   );
   for (let index = 0; index < walls_group.length; index++) {
@@ -790,7 +846,7 @@ function GenerateBathroom() {
   light_7.position.set(0, 0, STORE.Height);
   light_8.position.set(0, 0, -STORE.Height);
 
-  createWalls(STORE.type);
+  createWalls(STORE.type, STORE.material);
 }
 
 function GenerateMeasurements() {
@@ -1063,6 +1119,7 @@ function loadModel(URL) {
     URL,
     function (gltf) {
       model = gltf.scene;
+      console.log("insert",model);
       /*
       model.rotation.x = -Math.PI / 2;
       scene.add(model);
@@ -1070,7 +1127,6 @@ function loadModel(URL) {
       */
       let bbox = new THREE.Box3().setFromObject(model);
       let size = bbox.getSize(new THREE.Vector3());
-      console.log("size", size);
 
       //model.scale.x = length / relative_ratio / size.x ;
       //model.scale.y = height / relative_ratio / size.y ;
@@ -1766,7 +1822,7 @@ const UI = observer(() => {
                     200x200mm
                   </span>
                   <div className="hover1">
-                    <p>+</p>
+                    <p onClick = {(e) => {e.preventDefault(); STORE.material = 0}}>+</p>
                   </div>
                 </div>
                 <div
@@ -1784,7 +1840,7 @@ const UI = observer(() => {
                     200x200mm
                   </span>
                   <div className="hover1">
-                    <p>+</p>
+                    <p onClick = {(e) => {e.preventDefault(); STORE.material = 1}}>+</p>
                   </div>
                 </div>
                 <div
@@ -1802,7 +1858,7 @@ const UI = observer(() => {
                     200x200mm
                   </span>
                   <div className="hover1">
-                    <p>+</p>
+                    <p onClick = {(e) => {e.preventDefault(); STORE.material = 2}}>+</p>
                   </div>
                 </div>
               </div>
