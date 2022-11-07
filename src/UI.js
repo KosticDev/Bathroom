@@ -31,7 +31,11 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import CreateDate from "./components/Firebase/Create";
 import { readData } from "./components/Firebase/Read";
 import { update } from "firebase/database";
-import { savePositionData, clearPositionData, getPositionData } from "./utils/cacheData";
+import {
+  savePositionData,
+  clearPositionData,
+  getPositionData,
+} from "./utils/cacheData";
 
 const Room_types = [1, 2, 3, 4, 5, 6];
 const relative_ratio = 1000;
@@ -96,8 +100,6 @@ function initCamera() {
   scene.add(camera);
 }
 
-
-
 const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
 
 const labelRenderer = new CSS2DRenderer();
@@ -112,7 +114,6 @@ function initOrbit() {
   orbitControls.maxPolarAngle = 1.5;
   orbitControls.minAzimuthAngle = 0.1;
 }
-
 
 const frustum = 1000;
 const orthoCam = new THREE.OrthographicCamera(
@@ -152,23 +153,32 @@ function init() {
   camera.updateProjectionMatrix();
 }
 
-window.addEventListener('wheel', function(event)
-{
- if (event.deltaY < 0)
- {
-   STORE.scale += 0.1;
- }
- else if (event.deltaY > 0)
- {
-   STORE.scale -= 0.1;
-   //STORE.Scale -= 0.1;
- }
- init();
- GenerateMeasurements();
+window.addEventListener("wheel", function (event) {
+  let maxWidth = 50;
+  let xx = document.getElementsByClassName("roomsSideBar");
+  for (let i = 0; i < xx.length; i++) {
+    let rect = xx[i].getBoundingClientRect();
+    if (rect.right > maxWidth) maxWidth = rect.right;
+  }
+  xx = document.getElementsByClassName("sidebar");
+  for (let i = 0; i < xx.length; i++) {
+    let rect = xx[i].getBoundingClientRect();
+    if (rect.right > maxWidth) maxWidth = rect.right;
+  }
+  if (maxWidth > event.x) return;
+  
+  if (event.deltaY < 0) {
+    STORE.scale += 0.1;
+  } else if (event.deltaY > 0) {
+    STORE.scale -= 0.1;
+    //STORE.Scale -= 0.1;
+  }
+  init();
+  GenerateMeasurements();
 });
 
 function initLight() {
-  const Ambientlight = new THREE.AmbientLight( "white", 0.1 ); // soft white light
+  const Ambientlight = new THREE.AmbientLight("white", 0.1); // soft white light
   global_light = new THREE.HemisphereLight("white", "", 0.5);
   light_1 = new THREE.PointLight("white", 0.2, 20, 1);
   light_2 = new THREE.PointLight("white", 0.2, 20, 1);
@@ -178,10 +188,10 @@ function initLight() {
   light_6 = new THREE.PointLight("white", 0.2, 20, 1);
   light_7 = new THREE.PointLight("white", 0.2, 20, 1);
   light_8 = new THREE.PointLight("white", 0.2, 20, 1);
-  light_1.position.set(-5,1.2,0);
-  light_2.position.set(0,1.2,-4);
-  light_3.position.set(0,1.2,-4);
-  light_4.position.set(5,1.2,0);
+  light_1.position.set(-5, 1.2, 0);
+  light_2.position.set(0, 1.2, -4);
+  light_3.position.set(0, 1.2, -4);
+  light_4.position.set(5, 1.2, 0);
 
   //var Directionlight = new THREE.DirectionalLight("white", 0.5);
 
@@ -199,8 +209,6 @@ function initLight() {
   );
   global_light.position.set(10, 10, 10);
 }
-
-
 
 // const box = new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshStandardMaterial({ side: THREE.BackSide, transparent: true, color :'white' }));
 
@@ -321,8 +329,6 @@ function resize() {
 
 window.addEventListener("resize", resize, false);
 
-
-
 var selectedFlag = false;
 var temp_object = null;
 var temp_object_real = null;
@@ -356,8 +362,7 @@ const onmouseup = (e) => {
   isMouseDown = false;
   isDrag = false;
   orbitControls.enabled = true;
-  if (selectedItem !== null )
-  {
+  if (selectedItem !== null) {
     console.log("Mouse Up", selectedItem);
     savePositionData(1, selectedItem);
   }
@@ -1065,14 +1070,14 @@ function loadModel(URL) {
       */
       let bbox = new THREE.Box3().setFromObject(model);
       let size = bbox.getSize(new THREE.Vector3());
-      console.log("size",size);
-      
+      console.log("size", size);
+
       //model.scale.x = length / relative_ratio / size.x ;
       //model.scale.y = height / relative_ratio / size.y ;
       //model.scale.z = width / relative_ratio / size.z ;
-      model.position.y =  size.y* 0.5;
+      model.position.y = size.y * 0.5;
       //model.geometry.translate(0, 0.5, 0);
-      
+
       //model.rotation.y = Math.PI / 2;
       //model.children[0].material?.visible = true;
       InvisibleMat = new THREE.MeshBasicMaterial({
@@ -1082,11 +1087,7 @@ function loadModel(URL) {
         opacity: 0.3,
       });
       temp_model = new THREE.Mesh(
-        new THREE.BoxGeometry(
-          size.x,
-          size.y,
-          size.z
-        ),
+        new THREE.BoxGeometry(size.x, size.y, size.z),
         InvisibleMat
       );
       temp_model.userData.normalAxis = AXIS.Y;
@@ -1101,7 +1102,7 @@ function loadModel(URL) {
 }
 
 const initThree = () => {
-  console.log('Hay!!');
+  console.log("Hay!!");
   objects = [];
   scene = new THREE.Scene();
   initCamera();
@@ -1110,14 +1111,13 @@ const initThree = () => {
   initLight();
   GenerateBathroom();
   loadDoor("assets/doors/panel.glb", 1, 1);
-  loadModel("assets/bathtub.glb",1000,1800,500);
+  loadModel("assets/bathtub.glb", 1000, 1800, 500);
   animate();
   console.log(objects);
-}
+};
 initThree();
 
 const UI = observer(() => {
-  
   useEffect(() => {
     //initThree();
     clearPositionData();
@@ -1125,7 +1125,7 @@ const UI = observer(() => {
   }, []);
 
   useEffect(() => {
-    let current_position = localStorage.getItem('current_position');
+    let current_position = localStorage.getItem("current_position");
     if (current_position === null) current_position = -1;
     else current_position = parseInt(current_position);
     setPosition(current_position);
@@ -1143,7 +1143,7 @@ const UI = observer(() => {
     false,
     false,
   ]);
-  const [isCategory, setIsCategory] = useState(false);
+  const [isCategory, setIsCategory] = useState(true);
   const { isAdd, setAdd } = useState(false);
   const [file, setFile] = useState("");
   const [file1, setFile1] = useState("");
@@ -1160,6 +1160,7 @@ const UI = observer(() => {
   const [category, setCategory] = useState("");
 
   const [uploadCount, setUploadCount] = useState(0);
+  const [refresh, setRefresh] = useState(1);
 
   function AssignVal(e) {
     STORE[e.target.id] = e.target.value;
@@ -1244,26 +1245,21 @@ const UI = observer(() => {
     setTitle(e.target.value);
   }
 
-
   const saveData = async () => {
     let errorMessage = "";
-    if (title === "")
-    {
+    if (title === "") {
       errorMessage = "Please insert title!";
     }
 
-    if (percent1 !== 100)
-    {
+    if (percent1 !== 100) {
       errorMessage = "Please upload 3D model file!";
     }
 
-    if (percent !== 100)
-    {
+    if (percent !== 100) {
       errorMessage = "Please upload image file!";
     }
 
-    if (errorMessage !== "")
-    {
+    if (errorMessage !== "") {
       toastr.options = {
         positionClass: "toast-top-right",
         hideDuration: 300,
@@ -1312,39 +1308,38 @@ const UI = observer(() => {
     setHeader(title);
   }
 
-  function handleRemember(e, flag)
-  {
+  function handleRemember(e, flag) {
     e.preventDefault();
-    let positionData; 
+    let positionData;
     let positionVector;
-    if (flag === 0 )
-    {
+    if (flag === 0) {
       if (currentPosition === -1) return;
       positionData = getPositionData(currentPosition);
       positionVector = positionData.from;
-      localStorage.setItem('current_position', currentPosition - 1);
+      localStorage.setItem("current_position", currentPosition - 1);
       setCurrentPosition(currentPosition - 1);
     }
-    if (flag === 1 )
-    {
+    if (flag === 1) {
       if (currentPosition === position) return;
-      positionData = getPositionData(currentPosition+1);
+      positionData = getPositionData(currentPosition + 1);
       positionVector = positionData.to;
-      localStorage.setItem('current_position', currentPosition + 1);
+      localStorage.setItem("current_position", currentPosition + 1);
       setCurrentPosition(currentPosition + 1);
     }
-    let selectedObject = scene.getObjectByProperty( 'uuid', positionData.uuid);
+    let selectedObject = scene.getObjectByProperty("uuid", positionData.uuid);
     selectedObject.position.x = positionVector.x;
     selectedObject.position.y = positionVector.y;
     selectedObject.position.z = positionVector.z;
   }
   return (
     <div className="container vh-100 overflow-auto">
-      <Navbar init = {initThree} />
+      <Navbar init={initThree} />
       <Sidebar
         menuOption={menuOption}
         setMenuOption={setMenuOption}
         setIsCategory={setIsCategory}
+        refresh={refresh}
+        setRefresh={setRefresh}
       />
       <div className="row content">
         <div
@@ -1615,11 +1610,19 @@ const UI = observer(() => {
             >
               Bathroom Products
             </h6>
-            <span className="close">X</span>
+            <span
+              className="close"
+              onClick={(e) => {
+                e.preventDefault();
+                setIsCategory(1 - isCategory);
+              }}
+            >
+              X
+            </span>
           </div>
           {isCategory ? (
             <SubHeader
-              loadModel = {loadModel}
+              loadModel={loadModel}
               loadBathtub={loadBathtub}
               loadBathtub2={loadBathtub2}
               loadTapware={loadTapware}
@@ -1629,7 +1632,7 @@ const UI = observer(() => {
               header={header}
               category={category}
               setCategory={setCategory}
-              keyRefresh = {uploadCount}
+              keyRefresh={uploadCount}
             />
           ) : (
             <>
@@ -1728,7 +1731,15 @@ const UI = observer(() => {
             >
               Styling
             </h6>
-            <span className="close">X</span>
+            <span
+              className="close"
+              onClick={(e) => {
+                e.preventDefault();
+                setIsCategory(1 - isCategory);
+              }}
+            >
+              X
+            </span>
           </div>
           <div className="d-flex flex-wrap w-100">
             <h6
@@ -1810,7 +1821,15 @@ const UI = observer(() => {
             >
               Product Summary
             </h6>
-            <span className="close">X</span>
+            <span
+              className="close"
+              onClick={(e) => {
+                e.preventDefault();
+                setIsCategory(1 - isCategory);
+              }}
+            >
+              X
+            </span>
           </div>
         </div>
 
@@ -1915,14 +1934,20 @@ const UI = observer(() => {
               <img
                 className="d-block shadow-focus btn p-2 bg-light  m-3 rounded-1 radius1"
                 src="assets/ui/back.png"
-                style={{ width: "37px", opacity: `${currentPosition > -1? '1' : '0.5'}` }}
+                style={{
+                  width: "37px",
+                  opacity: `${currentPosition > -1 ? "1" : "0.5"}`,
+                }}
                 alt=""
                 onClick={(e) => handleRemember(e, 0)}
               />
               <img
                 className="d-block shadow-focus btn p-2 bg-light  m-3 rounded-1 radius1"
                 src="assets/ui/forward.png"
-                style={{ width: "37px", opacity: `${position > currentPosition? '1' : '0.5'}` }}
+                style={{
+                  width: "37px",
+                  opacity: `${position > currentPosition ? "1" : "0.5"}`,
+                }}
                 alt=""
                 onClick={(e) => handleRemember(e, 1)}
               />

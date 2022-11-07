@@ -1,5 +1,6 @@
-import "./index.css"
 import { Link, useNavigate } from 'react-router-dom'
+import { clearPositionData } from '../../utils/cacheData';
+import "./index.css"
 
 const Navbar = ( props ) => {
     const navigate = useNavigate();
@@ -8,6 +9,7 @@ const Navbar = ( props ) => {
         e.preventDefault();
         localStorage.setItem("bathroom_login", false);
         localStorage.setItem("bathroom_isOwner", false);
+        clearPositionData();
         navigate('/login');
         props.init();
     }
