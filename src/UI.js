@@ -1,6 +1,14 @@
 import { observer } from "mobx-react-lite";
+import { v4 as uuid_v4 } from "uuid";
 import React, { useEffect, useState } from "react";
-import { collection, addDoc, getDocs } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
 import { db } from "./components/Firebase/firebaseConfig";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
@@ -51,7 +59,6 @@ let temp_bathtub = null;
 let temp_bathtub1 = null;
 let temp_bathtub2 = null;
 let temp_tapware = null;
-let temp_door = null;
 let temp_shower = null;
 let model;
 let temp_model;
@@ -192,7 +199,7 @@ function initLight() {
   */
   global_light = new THREE.HemisphereLight("white", "", 0.5);
   global_light.position.set(0, STORE.Height, 0);
-  
+
   light_1 = new THREE.PointLight("white", 0.1, 0, 1);
   light_2 = new THREE.PointLight("white", 0.2, 0, 1);
   light_3 = new THREE.PointLight("white", 0.2, 0, 1);
@@ -202,15 +209,15 @@ function initLight() {
   light_7 = new THREE.PointLight("white", 0.2, 0, 1);
   light_8 = new THREE.PointLight("white", 0.2, 0, 1);
 
-  light_1.position.set(0, STORE.Height/2, 0);
-  light_2.position.set(STORE.Width / 2, STORE.Height/2, 0);
+  light_1.position.set(0, STORE.Height / 2, 0);
+  light_2.position.set(STORE.Width / 2, STORE.Height / 2, 0);
   light_3.position.set(STORE.Width, 1, 0);
   light_4.position.set(-STORE.Width, 1, 0);
   light_5.position.set(0, 1, STORE.Height);
   light_6.position.set(0, 1, -STORE.Height);
   light_7.position.set(0, 0, STORE.Height);
   light_8.position.set(0, 0, -STORE.Height);
-  
+
   scene.add(
     global_light,
     light_1,
@@ -220,10 +227,8 @@ function initLight() {
     light_5,
     light_6,
     light_7,
-    light_8,
-    
+    light_8
   );
-  
 }
 
 // const box = new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshStandardMaterial({ side: THREE.BackSide, transparent: true, color :'white' }));
@@ -377,10 +382,8 @@ const onmousedown = (e) => {
 };
 
 function getObjectColor(object) {
-  if (object.material !== undefined && object.material.color !== undefined )
-  {
-    if (object.userData.type !== 'door' && obtainedObjectColor === null)
-    {
+  if (object.material !== undefined && object.material.color !== undefined) {
+    if (object.userData.type !== "door" && obtainedObjectColor === null) {
       obtainedObjectColor = object.material.color;
     }
   }
@@ -430,15 +433,18 @@ const onmouseup = (e) => {
     temp_object_real = objectIntersects[1].object;
 
     $(".functionBoard").css({ display: "block" });
-    if (temp_object.userData.type === 'door')
-    {
+    if (temp_object.userData.type === "door") {
       console.log(temp_object);
       getObjectColor(temp_object);
       let redColor = parseInt(255 * obtainedObjectColor.r);
       let greenColor = parseInt(255 * obtainedObjectColor.g);
       let blueColor = parseInt(255 * obtainedObjectColor.b);
       $(".colorBoard").css({ display: "block" });
-      document.getElementsByClassName('colorBoard')[0].value = rgbToHex(redColor, greenColor, blueColor);
+      document.getElementsByClassName("colorBoard")[0].value = rgbToHex(
+        redColor,
+        greenColor,
+        blueColor
+      );
       obtainedObjectColor = null;
     }
   } else if (hoverItem && !isDrag) {
@@ -493,11 +499,16 @@ function deleteObject() {
 
 function changeColor(e) {
   e.preventDefault();
-  let hexColor = document.getElementsByClassName('colorBoard')[0].value;
+  let hexColor = document.getElementsByClassName("colorBoard")[0].value;
   hexColor = hexColor.slice(1);
   var aRgbHex = hexColor.match(/.{1,2}/g);
-  let objColor = { r: parseInt(aRgbHex[0], 16)/255, g: parseInt(aRgbHex[1], 16)/255, b: parseInt(aRgbHex[2], 16)/255, isColor: true };
-  objectTraverse(temp_object, objColor)
+  let objColor = {
+    r: parseInt(aRgbHex[0], 16) / 255,
+    g: parseInt(aRgbHex[1], 16) / 255,
+    b: parseInt(aRgbHex[2], 16) / 255,
+    isColor: true,
+  };
+  objectTraverse(temp_object, objColor);
 }
 
 window.addEventListener("mousemove", onmousemove);
@@ -950,7 +961,7 @@ function loadDoor(url, num, num1, objColor) {
         transparent: true,
         opacity: 0.3,
       });
-      temp_door = new THREE.Mesh(
+      let temp_door = new THREE.Mesh(
         new THREE.BoxGeometry(
           wallItems.door.width,
           wallItems.door.height,
@@ -964,14 +975,14 @@ function loadDoor(url, num, num1, objColor) {
       temp_door.userData.normalVector = new Vector3(0, 0, 1);
       temp_door.userData.dir = DIR.START;
       temp_door.userData.type = "door";
-      temp_door.userData.url = URL;
+      temp_door.userData.url = url;
       door = gltf.scene;
       door.scale.x = num;
       door.scale.y = num;
       door.scale.z = num / 2;
 
       //let objColor = { r: 1, g: 0, b: 0, isColor: true };
-      if (objColor !== undefined && objColor !==null)
+      if (objColor !== undefined && objColor !== null)
         objectTraverse(door, objColor);
 
       temp_door.add(door);
@@ -993,7 +1004,7 @@ function Window(url, num, num1) {
         transparent: true,
         opacity: 0.3,
       });
-      temp_door = new THREE.Mesh(
+      let temp_door = new THREE.Mesh(
         new THREE.BoxGeometry(
           wallItems.door.width,
           wallItems.door.height / 2,
@@ -1006,6 +1017,8 @@ function Window(url, num, num1) {
       temp_door.userData.normalAxis = AXIS.Z;
       temp_door.userData.normalVector = new Vector3(0, 0, 1);
       temp_door.userData.dir = DIR.START;
+      temp_door.userData.url = url;
+      temp_door.userData.type = 'window';
       door = gltf.scene;
       door.scale.x = num;
       door.scale.y = num;
@@ -1016,7 +1029,6 @@ function Window(url, num, num1) {
     }
   );
 }
-
 
 function loadModel(URL) {
   gltfLoader.load(
@@ -1054,16 +1066,204 @@ function loadModel(URL) {
       temp_model.userData.normalAxis = AXIS.Y;
       temp_model.userData.url = URL;
       temp_model.geometry.translate(0, size.y * 0.5, 0);
+      temp_model.userData.type = 'other';
       //tapware.children[0].material.visible = true;
       temp_model.add(model);
       scene.add(temp_model);
       objects.push(temp_model);
-      console.log('object',objects);
+      console.log("object", objects);
       animate();
     }
   );
 }
 
+const loadSavedModel = (object) => {
+  gltfLoader.load(
+    // resource URL
+    object.url,
+    function (gltf) {
+      model = gltf.scene;
+      
+      model.position.x = object.inner.position.x;
+      model.position.y = object.inner.position.y;
+      model.position.z = object.inner.position.z;
+      model.scale.x = object.inner.scale.x;
+      model.scale.y = object.inner.scale.y;
+      model.scale.z = object.inner.scale.z;
+      
+      InvisibleMat = new THREE.MeshBasicMaterial({
+        color: "red",
+        visible: false,
+        transparent: true,
+        opacity: 0.3,
+      });
+      temp_model = new THREE.Mesh(
+        new THREE.BoxGeometry(
+          object.outer.width,
+          object.outer.height,
+          object.outer.depth
+        ),
+        InvisibleMat
+      );
+      
+      temp_model.userData = object.outer.userData;
+      
+      temp_model.position.x = object.outer.position.x;
+      temp_model.position.y = object.outer.position.y;
+      temp_model.position.z = object.outer.position.z;
+      temp_model.scale.x = object.outer.scale.x;
+      temp_model.scale.y = object.outer.scale.y;
+      temp_model.scale.z = object.outer.scale.z;
+      
+      if (object.outer.userData.type === 'window')
+      {
+        temp_model.geometry.translate(0, wallItems.door.height * 0.22, 0);
+      }
+      else
+      {
+        temp_model.geometry.translate(0, object.outer.height/2, 0);
+      }
+      console.log(object.outer.color);
+
+      if (object.outer.color !== undefined && object.outer.color !== null)
+      {
+        let color1= {
+          r: object.outer.color.r,
+          g: object.outer.color.g,
+          b: object.outer.color.b,
+          isColor: true
+        }
+        objectTraverse(model, color1);
+      }
+
+      temp_model.add(model);
+      scene.add(temp_model);
+      objects.push(temp_model);
+      animate();
+    }
+  );
+};
+
+const getObjectData = async () => {
+  const q = query(collection(db, "object_data"));
+  let userId = localStorage.getItem("userId");
+  let objectData = [];
+
+  const querySnapshot = await getDocs(q);
+  querySnapshot.forEach((doc) => {
+    // doc.data() is never undefined for query doc snapshots
+    console.log(doc.id, " => ", doc.data());
+    let data = doc.data();
+    data = data.objectData.data;
+    data = JSON.parse(data);
+    data.id = doc.id;
+    if (data.userId === userId) {
+      objectData.push(data);
+    }
+  });
+  STORE.fetchedObjectData = objectData;
+};
+
+const deleteSavedObject = async (e, id) => {
+  e.preventDefault();
+  const docRef = doc(db, "object_data", id);
+  deleteDoc(docRef)
+    .then(() => {
+      console.log("Entire Document has been deleted successfully.");
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+  getObjectData();
+  
+};
+
+const saveObjectData = async (title) => {
+  let objectData = {};
+  let userId = localStorage.getItem("userId");
+  objectData.userId = userId;
+  objectData.title = title;
+  objectData.type = STORE.type;
+  objectData.material = STORE.material;
+  console.log(scene);
+  let rawData = [];
+  for (let i = 0; i < scene.children.length; i++) {
+    if (
+      scene.children[i].userData.url !== undefined &&
+      scene.children[i].userData.url !== null
+    ) {
+      let outer = {};
+      let inner = {};
+      let url = scene.children[i].userData.url;
+      outer.userData = scene.children[i].userData;
+      outer.position = scene.children[i].position;
+      outer.scale = scene.children[i].scale;
+      outer.width = scene.children[i].geometry.parameters.width;
+      outer.height = scene.children[i].geometry.parameters.height;
+      outer.depth = scene.children[i].geometry.parameters.depth;
+
+      inner.position = scene.children[i].children[0].position;
+      inner.scale = scene.children[i].children[0].scale;
+
+      if (scene.children[i].userData.type === "door") {
+        getObjectColor(scene.children[i]);
+        outer.color = {};
+        outer.color.r = obtainedObjectColor.r;
+        outer.color.g = obtainedObjectColor.g;
+        outer.color.b = obtainedObjectColor.b;
+
+      }
+      rawData.push({ outer: outer, inner: inner, url: url });
+    }
+  }
+  objectData.data = rawData;
+  console.log(objectData);
+  objectData = JSON.stringify(objectData);
+  console.log(objectData);
+  objectData = { data: objectData };
+  const docRef = await addDoc(collection(db, "object_data"), {
+    objectData,
+  });
+  console.log("Document written with ID: ", docRef.id);
+
+  toastr.options = {
+    positionClass: "toast-top-right",
+    hideDuration: 300,
+    timeOut: 2000,
+  };
+  toastr.clear();
+  setTimeout(() => toastr.success(`Sucessfully done`), 300);
+
+  getObjectData();
+};
+
+const showSavedObjectData = (e, id) => {
+  e.preventDefault();
+  clearPositionData();
+  let objectData = {};
+  for (let i = 0; i < STORE.fetchedObjectData.length; i++) {
+    if (STORE.fetchedObjectData[i].id === id) {
+      objectData = STORE.fetchedObjectData[i];
+    }
+  }
+  objects = [];
+  scene = new THREE.Scene();
+  STORE.type = objectData.type;
+  STORE.material = objectData.material;
+  scene.background = new THREE.Color(0x808080);
+
+  initCamera();
+  initOrbit();
+  init();
+  initLight();
+  GenerateBathroom();
+
+  for (let i = 0; i < objectData.data.length; i++) {
+    loadSavedModel(objectData.data[i]);
+  }
+
+  animate();
+};
 const initThree = () => {
   console.log("Hay!!");
   objects = [];
@@ -1118,6 +1318,8 @@ const UI = observer(() => {
   const [title, setTitle] = useState("");
   const [position, setPosition] = useState(-1);
   const [currentPosition, setCurrentPosition] = useState(-1);
+  const [saveDialogShow, setSaveDialogShow] = useState(false);
+  const [objectTitle, setObjectTitle] = useState("");
 
   const [header, setHeader] = useState("");
   const [category, setCategory] = useState("");
@@ -1303,6 +1505,7 @@ const UI = observer(() => {
         setIsCategory={setIsCategory}
         refresh={refresh}
         setRefresh={setRefresh}
+        getObjectData={getObjectData}
       />
       <div className="row content">
         <div
@@ -1841,6 +2044,45 @@ const UI = observer(() => {
             </h6>
             <span className="close">X</span>
           </div>
+          <div className="flex flex-col w-100 justify-center">
+            {STORE.fetchedObjectData.map((data) => {
+              return (
+                <div
+                  key={uuid_v4()}
+                  className="mx-[20px] rounded-[5px] p-[10px] mb-[10px] border-gray-200 border-[1px] flex flex-row justify-between items-center"
+                >
+                  <p
+                    onClick={(e) => {
+                      showSavedObjectData(e, data.id);
+                    }}
+                    className="cursor-pointer"
+                  >
+                    {data.title}
+                  </p>
+                  <div
+                    className="functionBoard"
+                    onClick={(e) => {
+                      deleteSavedObject(e, data.id);
+                    }}
+                  >
+                    <i className="fa fa-trash"></i>
+                  </div>
+                </div>
+              );
+            })}
+
+            <div className="m-auto">
+              <button
+                className="py-[10px] px-[40px] border-[1px] border-gray-600 rounded-[5px]"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setSaveDialogShow(true);
+                }}
+              >
+                Save
+              </button>
+            </div>
+          </div>
         </div>
         <div className="col-12 position-relative p-0 m-0">
           <div
@@ -1953,6 +2195,41 @@ const UI = observer(() => {
               />
             </div>
           </div>
+          {saveDialogShow && (
+            <div className="modal h-[50%] block">
+              <div className="create_window ">
+                <div className="grid gird-col-1 w-[100%] gap-3">
+                  <span
+                    className="close1"
+                    onClick={() => setSaveDialogShow(false)}
+                  >
+                    &times;
+                  </span>
+                  <label>
+                    <small>Title </small>
+                  </label>
+                  <input
+                    type="text"
+                    name="title"
+                    onChange={(e) => {
+                      e.preventDefault();
+                      setObjectTitle(e.target.value);
+                    }}
+                  />
+                  <button
+                    className="py-[10px] px-[40px] border-[1px] border-gray-600 rounded-[5px]"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      saveObjectData(objectTitle);
+                      setSaveDialogShow(false);
+                    }}
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
           <div
             className="modal"
             style={{

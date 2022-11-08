@@ -35,6 +35,7 @@ export default function Login() {
             if (data.name === name.value && data.password === password.value)
             {
                 localStorage.setItem("bathroom_login", true);
+                localStorage.setItem("userId", doc.id);
                 console.log(data.isOwner);
                 if (data.isOwner === 1) localStorage.setItem("bathroom_isOwner", true);
                 else localStorage.setItem("bathroom_isOwner", false);

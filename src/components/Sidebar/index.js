@@ -1,7 +1,7 @@
 import "./index.css"
 import { useState } from "react";
 
-const Sidebar = ({ menuOption, setMenuOption, setIsCategory, refresh, setRefresh }) => {
+const Sidebar = ({ menuOption, setMenuOption, setIsCategory, refresh, setRefresh, getObjectData }) => {
     const [isOpen, setOpen] = useState(true)
 
     const trigSidebar = () => {
@@ -9,6 +9,7 @@ const Sidebar = ({ menuOption, setMenuOption, setIsCategory, refresh, setRefresh
     }
 
     const handleMenu = (index) => {
+        if (index === 6) getObjectData();
         let tempData = menuOption;
         setOpen(false);
         for (let i = 0; i < tempData.length; i++) {
