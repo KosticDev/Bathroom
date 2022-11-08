@@ -181,22 +181,36 @@ window.addEventListener("wheel", function (event) {
 
 function initLight() {
   const Ambientlight = new THREE.AmbientLight("white", 0.1); // soft white light
+  /*
+  const directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
+  scene.add( directionalLight );
+  directionalLight.position.set(0,2,0);
+
+  const light = new THREE.HemisphereLight( 0xffffff, "", 0.5 );
+  scene.add( light );
+  light.position.set(0,2,0);
+  */
   global_light = new THREE.HemisphereLight("white", "", 0.5);
-  light_1 = new THREE.PointLight("white", 0.2, 20, 1);
-  light_2 = new THREE.PointLight("white", 0.2, 20, 1);
-  light_3 = new THREE.PointLight("white", 0.2, 20, 1);
-  light_4 = new THREE.PointLight("white", 0.2, 20, 1);
-  light_5 = new THREE.PointLight("white", 0.2, 20, 1);
-  light_6 = new THREE.PointLight("white", 0.2, 20, 1);
-  light_7 = new THREE.PointLight("white", 0.2, 20, 1);
-  light_8 = new THREE.PointLight("white", 0.2, 20, 1);
-  light_1.position.set(-5, 1.2, 0);
-  light_2.position.set(0, 1.2, -4);
-  light_3.position.set(0, 1.2, -4);
-  light_4.position.set(5, 1.2, 0);
+  global_light.position.set(0, STORE.Height, 0);
+  
+  light_1 = new THREE.PointLight("white", 0.1, 0, 1);
+  light_2 = new THREE.PointLight("white", 0.2, 0, 1);
+  light_3 = new THREE.PointLight("white", 0.2, 0, 1);
+  light_4 = new THREE.PointLight("white", 0.2, 0, 1);
+  light_5 = new THREE.PointLight("white", 0.2, 0, 1);
+  light_6 = new THREE.PointLight("white", 0.2, 0, 1);
+  light_7 = new THREE.PointLight("white", 0.2, 0, 1);
+  light_8 = new THREE.PointLight("white", 0.2, 0, 1);
 
-  //var Directionlight = new THREE.DirectionalLight("white", 0.5);
-
+  light_1.position.set(0, STORE.Height/2, 0);
+  light_2.position.set(STORE.Width / 2, STORE.Height/2, 0);
+  light_3.position.set(STORE.Width, 1, 0);
+  light_4.position.set(-STORE.Width, 1, 0);
+  light_5.position.set(0, 1, STORE.Height);
+  light_6.position.set(0, 1, -STORE.Height);
+  light_7.position.set(0, 0, STORE.Height);
+  light_8.position.set(0, 0, -STORE.Height);
+  
   scene.add(
     global_light,
     light_1,
@@ -206,9 +220,10 @@ function initLight() {
     light_5,
     light_6,
     light_7,
-    light_8
+    light_8,
+    
   );
-  global_light.position.set(10, 10, 10);
+  
 }
 
 // const box = new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshStandardMaterial({ side: THREE.BackSide, transparent: true, color :'white' }));
@@ -891,15 +906,6 @@ function createWalls(type, material) {
 
 function GenerateBathroom() {
   orthoCam.position.y = STORE.Height + DELTA_DIS;
-  light_1.position.set(-STORE.Width / 2, STORE.Height, 0);
-  light_2.position.set(STORE.Width / 2, STORE.Height, 0);
-  light_3.position.set(STORE.Width, 1, 0);
-  light_4.position.set(-STORE.Width, 1, 0);
-  light_5.position.set(0, 1, STORE.Height);
-  light_6.position.set(0, 1, -STORE.Height);
-  light_7.position.set(0, 0, STORE.Height);
-  light_8.position.set(0, 0, -STORE.Height);
-
   createWalls(STORE.type, STORE.material);
 }
 
@@ -958,6 +964,7 @@ function loadDoor(url, num, num1, objColor) {
       temp_door.userData.normalVector = new Vector3(0, 0, 1);
       temp_door.userData.dir = DIR.START;
       temp_door.userData.type = "door";
+      temp_door.userData.url = URL;
       door = gltf.scene;
       door.scale.x = num;
       door.scale.y = num;
@@ -1010,179 +1017,6 @@ function Window(url, num, num1) {
   );
 }
 
-function Shower() {
-  gltfLoader.load(
-    // resource URL
-    "assets/doors/shower.glb",
-    // called when the resource is loaded
-    function (gltf) {
-      shower = gltf.scene;
-      InvisibleMat = new THREE.MeshBasicMaterial({
-        color: "red",
-        visible: false,
-        transparent: true,
-        opacity: 0.3,
-      });
-      temp_shower = new THREE.Mesh(
-        new THREE.BoxGeometry(
-          wallItems.shower.width,
-          wallItems.shower.height,
-          wallItems.shower.depth * 5
-        ),
-        InvisibleMat
-      );
-      temp_shower.geometry.translate(0, wallItems.shower.height * 0.5, 0);
-      temp_shower.position.set(0, 0, -STORE.Length / 2 - 0.1);
-      temp_shower.userData.normalAxis = AXIS.Z;
-      temp_shower.userData.normalVector = new Vector3(0, 0, 1);
-      shower.children[0].material.visible = true;
-      temp_shower.userData.dir = DIR.START;
-      temp_shower.add(shower);
-      scene.add(temp_shower);
-      objects.push(temp_shower);
-    }
-  );
-}
-
-function loadBathtub(URL) {
-  gltfLoader.load(
-    // resource URL
-    URL,
-    function (gltf) {
-      bathtub = gltf.scene;
-      bathtub.scale.x = 0.9;
-      bathtub.scale.y = 0.9;
-      bathtub.scale.z = 0.9;
-      bathtub.rotation.y = Math.PI;
-      bathtub.position.x = -1.4;
-      InvisibleMat = new THREE.MeshBasicMaterial({
-        color: "red",
-        visible: false,
-        transparent: true,
-        opacity: 0.3,
-      });
-      temp_bathtub = new THREE.Mesh(
-        new THREE.BoxGeometry(
-          wallItems.bathtub.width - 0.45,
-          wallItems.bathtub.height,
-          wallItems.bathtub.depth - 0.37
-        ),
-        InvisibleMat
-      );
-      temp_bathtub.geometry.translate(0, wallItems.bathtub.height * 0.5, 0);
-      temp_bathtub.position.set(-1, 0, -1);
-      temp_bathtub.userData.normalAxis = AXIS.Y;
-      bathtub.children[0].material.visible = true;
-      temp_bathtub.add(bathtub);
-      scene.add(temp_bathtub);
-      objects.push(temp_bathtub);
-    }
-  );
-}
-
-function loadBathtub2(URL, num, num1) {
-  gltfLoader.load(
-    // resource URL
-    URL,
-    function (gltf) {
-      bathtub2 = gltf.scene;
-      bathtub2.scale.x = 0.9;
-      bathtub2.scale.y = 0.9;
-      bathtub2.scale.z = 0.9;
-      bathtub2.rotation.y = Math.PI;
-      InvisibleMat = new THREE.MeshBasicMaterial({
-        color: "red",
-        visible: false,
-        transparent: true,
-        opacity: 0.3,
-      });
-      temp_bathtub2 = new THREE.Mesh(
-        new THREE.BoxGeometry(
-          wallItems.bathtub2.width - num,
-          wallItems.bathtub2.height,
-          wallItems.bathtub2.depth - num1
-        ),
-        InvisibleMat
-      );
-      temp_bathtub2.geometry.translate(0, wallItems.bathtub2.height * 0.5, 0);
-      temp_bathtub2.position.set(1, 0, 1);
-      temp_bathtub2.userData.normalAxis = AXIS.Y;
-      // bathtub2.children[0].material.visible = true;
-      temp_bathtub2.add(bathtub2);
-      scene.add(temp_bathtub2);
-      objects.push(temp_bathtub2);
-    }
-  );
-}
-
-function loadBathtub1() {
-  gltfLoader.load(
-    // resource URL
-    "assets/doors/bathtub.glb",
-    function (gltf) {
-      bathtub1 = gltf.scene;
-      bathtub1.scale.x = 0.25;
-      bathtub1.scale.y = 0.25;
-      bathtub1.scale.z = 0.25;
-      bathtub1.rotation.y = Math.PI / 2;
-      InvisibleMat = new THREE.MeshBasicMaterial({
-        color: "red",
-        visible: false,
-        transparent: true,
-        opacity: 0.3,
-      });
-      temp_bathtub1 = new THREE.Mesh(
-        new THREE.BoxGeometry(
-          wallItems.bathtub1.width,
-          wallItems.bathtub1.height,
-          wallItems.bathtub1.depth
-        ),
-        InvisibleMat
-      );
-      temp_bathtub1.geometry.translate(0, wallItems.bathtub1.height * 0.5, 0);
-      temp_bathtub1.userData.normalAxis = AXIS.Y;
-      bathtub1.children[0].material.visible = true;
-      temp_bathtub1.add(bathtub1);
-      scene.add(temp_bathtub1);
-      objects.push(temp_bathtub1);
-    }
-  );
-}
-
-function loadTapware(URL, num, num1, num2) {
-  gltfLoader.load(
-    // resource URL
-    URL,
-    function (gltf) {
-      tapware = gltf.scene;
-      tapware.scale.y = 2;
-      tapware.scale.x = 2;
-      tapware.scale.z = 2;
-      tapware.rotation.y = Math.PI;
-      InvisibleMat = new THREE.MeshBasicMaterial({
-        color: "red",
-        visible: false,
-        transparent: true,
-        opacity: 0.3,
-      });
-      temp_tapware = new THREE.Mesh(
-        new THREE.BoxGeometry(
-          wallItems.tapware.width / 10 - num,
-          wallItems.tapware.height / 2 - num2,
-          wallItems.tapware.depth / 2 - num1
-        ),
-        InvisibleMat
-      );
-      temp_tapware.geometry.translate(0, wallItems.tapware.height * 0.01, 0);
-      temp_tapware.position.set(1, 0.12, 1);
-      temp_tapware.userData.normalAxis = AXIS.Y;
-      // tapware.children[0].material.visible = true;
-      temp_tapware.add(tapware);
-      scene.add(temp_tapware);
-      objects.push(temp_tapware);
-    }
-  );
-}
 
 function loadModel(URL) {
   gltfLoader.load(
@@ -1218,11 +1052,13 @@ function loadModel(URL) {
         InvisibleMat
       );
       temp_model.userData.normalAxis = AXIS.Y;
+      temp_model.userData.url = URL;
       temp_model.geometry.translate(0, size.y * 0.5, 0);
       //tapware.children[0].material.visible = true;
       temp_model.add(model);
       scene.add(temp_model);
       objects.push(temp_model);
+      console.log('object',objects);
       animate();
     }
   );
@@ -1238,7 +1074,7 @@ const initThree = () => {
   initLight();
   GenerateBathroom();
   loadDoor("assets/doors/panel.glb", 1, 1);
-  loadModel("assets/bathtub.glb", 1000, 1800, 500);
+  loadModel("assets/bathtub.glb");
   animate();
   console.log(objects);
 };
@@ -1750,10 +1586,6 @@ const UI = observer(() => {
           {isCategory ? (
             <SubHeader
               loadModel={loadModel}
-              loadBathtub={loadBathtub}
-              loadBathtub2={loadBathtub2}
-              loadTapware={loadTapware}
-              shower={Shower}
               setShow={setShow}
               setIsCategory={setIsCategory}
               header={header}
