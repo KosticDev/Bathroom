@@ -488,12 +488,17 @@ $("body").keydown(function (event) {
 
 function deleteObject() {
   if (temp_object_real != null) {
+
+    for(let i=0;i<objects.length;i++)
+    {
+      if (objects[i].uuid === temp_object.uuid)
+      {
+        objects.splice(i, 1);
+        break;
+      }
+    }
+
     temp_object.parent.remove(temp_object);
-    /*
-    temp_object.visible = false;
-    temp_object_real.visible = false;
-    temp_object_real = null;
-    */
   }
 }
 
@@ -1036,23 +1041,12 @@ function loadModel(URL) {
     URL,
     function (gltf) {
       model = gltf.scene;
-      console.log("insert", model);
-      /*
-      model.rotation.x = -Math.PI / 2;
-      scene.add(model);
-      objects.push(model);
-      */
+
       let bbox = new THREE.Box3().setFromObject(model);
       let size = bbox.getSize(new THREE.Vector3());
 
-      //model.scale.x = length / relative_ratio / size.x ;
-      //model.scale.y = height / relative_ratio / size.y ;
-      //model.scale.z = width / relative_ratio / size.z ;
       model.position.y = size.y * 0.5;
-      //model.geometry.translate(0, 0.5, 0);
 
-      //model.rotation.y = Math.PI / 2;
-      //model.children[0].material?.visible = true;
       InvisibleMat = new THREE.MeshBasicMaterial({
         color: "red",
         visible: false,
@@ -1067,11 +1061,12 @@ function loadModel(URL) {
       temp_model.userData.url = URL;
       temp_model.geometry.translate(0, size.y * 0.5, 0);
       temp_model.userData.type = 'other';
-      //tapware.children[0].material.visible = true;
+
       temp_model.add(model);
+      console.log(temp_model);
       scene.add(temp_model);
       objects.push(temp_model);
-      console.log("object", objects);
+      console.log('created',scene);
       animate();
     }
   );
@@ -1123,7 +1118,6 @@ const loadSavedModel = (object) => {
       {
         temp_model.geometry.translate(0, object.outer.height/2, 0);
       }
-      console.log(object.outer.color);
 
       if (object.outer.color !== undefined && object.outer.color !== null)
       {
@@ -1185,7 +1179,6 @@ const saveObjectData = async (title) => {
   objectData.title = title;
   objectData.type = STORE.type;
   objectData.material = STORE.material;
-  console.log(scene);
   let rawData = [];
   for (let i = 0; i < scene.children.length; i++) {
     if (
@@ -1217,9 +1210,7 @@ const saveObjectData = async (title) => {
     }
   }
   objectData.data = rawData;
-  console.log(objectData);
   objectData = JSON.stringify(objectData);
-  console.log(objectData);
   objectData = { data: objectData };
   const docRef = await addDoc(collection(db, "object_data"), {
     objectData,
@@ -1265,7 +1256,6 @@ const showSavedObjectData = (e, id) => {
   animate();
 };
 const initThree = () => {
-  console.log("Hay!!");
   objects = [];
   scene = new THREE.Scene();
   initCamera();
@@ -1276,7 +1266,6 @@ const initThree = () => {
   loadDoor("assets/doors/panel.glb", 1, 1);
   loadModel("assets/bathtub.glb");
   animate();
-  console.log(objects);
 };
 initThree();
 
