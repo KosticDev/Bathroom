@@ -488,11 +488,8 @@ $("body").keydown(function (event) {
 
 function deleteObject() {
   if (temp_object_real != null) {
-
-    for(let i=0;i<objects.length;i++)
-    {
-      if (objects[i].uuid === temp_object.uuid)
-      {
+    for (let i = 0; i < objects.length; i++) {
+      if (objects[i].uuid === temp_object.uuid) {
         objects.splice(i, 1);
         break;
       }
@@ -955,6 +952,7 @@ function objectTraverse(object, objColor) {
 }
 
 function loadDoor(url, num, num1, objColor) {
+  $("#loading_spinner").fadeIn(300);
   gltfLoader.load(
     // resource URL
     url,
@@ -995,9 +993,13 @@ function loadDoor(url, num, num1, objColor) {
       objects.push(temp_door);
     }
   );
+  setTimeout(function () {
+    $("#loading_spinner").fadeOut(300);
+  }, 500);
 }
 
 function Window(url, num, num1) {
+  $("#loading_spinner").fadeIn(300);
   gltfLoader.load(
     // resource URL
     url,
@@ -1023,7 +1025,7 @@ function Window(url, num, num1) {
       temp_door.userData.normalVector = new Vector3(0, 0, 1);
       temp_door.userData.dir = DIR.START;
       temp_door.userData.url = url;
-      temp_door.userData.type = 'window';
+      temp_door.userData.type = "window";
       door = gltf.scene;
       door.scale.x = num;
       door.scale.y = num;
@@ -1033,9 +1035,13 @@ function Window(url, num, num1) {
       objects.push(temp_door);
     }
   );
+  setTimeout(function () {
+    $("#loading_spinner").fadeOut(300);
+  }, 500);
 }
 
 function loadModel(URL) {
+  $("#loading_spinner").fadeIn(300);
   gltfLoader.load(
     // resource URL
     URL,
@@ -1060,16 +1066,19 @@ function loadModel(URL) {
       temp_model.userData.normalAxis = AXIS.Y;
       temp_model.userData.url = URL;
       temp_model.geometry.translate(0, size.y * 0.5, 0);
-      temp_model.userData.type = 'other';
+      temp_model.userData.type = "other";
 
       temp_model.add(model);
       console.log(temp_model);
       scene.add(temp_model);
       objects.push(temp_model);
-      console.log('created',scene);
+      console.log("created", scene);
       animate();
     }
   );
+  setTimeout(function () {
+    $("#loading_spinner").fadeOut(300);
+  }, 500);
 }
 
 const loadSavedModel = (object) => {
@@ -1078,14 +1087,14 @@ const loadSavedModel = (object) => {
     object.url,
     function (gltf) {
       model = gltf.scene;
-      
+
       model.position.x = object.inner.position.x;
       model.position.y = object.inner.position.y;
       model.position.z = object.inner.position.z;
       model.scale.x = object.inner.scale.x;
       model.scale.y = object.inner.scale.y;
       model.scale.z = object.inner.scale.z;
-      
+
       InvisibleMat = new THREE.MeshBasicMaterial({
         color: "red",
         visible: false,
@@ -1100,33 +1109,29 @@ const loadSavedModel = (object) => {
         ),
         InvisibleMat
       );
-      
+
       temp_model.userData = object.outer.userData;
-      
+
       temp_model.position.x = object.outer.position.x;
       temp_model.position.y = object.outer.position.y;
       temp_model.position.z = object.outer.position.z;
       temp_model.scale.x = object.outer.scale.x;
       temp_model.scale.y = object.outer.scale.y;
       temp_model.scale.z = object.outer.scale.z;
-      
-      if (object.outer.userData.type === 'window')
-      {
+
+      if (object.outer.userData.type === "window") {
         temp_model.geometry.translate(0, wallItems.door.height * 0.22, 0);
-      }
-      else
-      {
-        temp_model.geometry.translate(0, object.outer.height/2, 0);
+      } else {
+        temp_model.geometry.translate(0, object.outer.height / 2, 0);
       }
 
-      if (object.outer.color !== undefined && object.outer.color !== null)
-      {
-        let color1= {
+      if (object.outer.color !== undefined && object.outer.color !== null) {
+        let color1 = {
           r: object.outer.color.r,
           g: object.outer.color.g,
           b: object.outer.color.b,
-          isColor: true
-        }
+          isColor: true,
+        };
         objectTraverse(model, color1);
       }
 
@@ -1169,7 +1174,6 @@ const deleteSavedObject = async (e, id) => {
       console.log(error);
     });
   getObjectData();
-  
 };
 
 const saveObjectData = async (title) => {
@@ -1204,7 +1208,6 @@ const saveObjectData = async (title) => {
         outer.color.r = obtainedObjectColor.r;
         outer.color.g = obtainedObjectColor.g;
         outer.color.b = obtainedObjectColor.b;
-
       }
       rawData.push({ outer: outer, inner: inner, url: url });
     }
@@ -2264,6 +2267,11 @@ const UI = observer(() => {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+      <div id="loading_spinner">
+        <div className="cv_spinner">
+          <span className="span_spinner"></span>
         </div>
       </div>
     </div>
