@@ -1,2 +1,0 @@
-git.username : KosticDev
-git.email: jackkostic0510@gmail.com
