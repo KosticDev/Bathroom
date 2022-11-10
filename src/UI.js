@@ -2068,7 +2068,20 @@ const UI = observer(() => {
                 className="py-[10px] px-[40px] border-[1px] border-gray-600 rounded-[5px]"
                 onClick={(e) => {
                   e.preventDefault();
-                  setSaveDialogShow(true);
+                  if (localStorage.getItem("bathroom_login") === "true")
+                  {
+                    setSaveDialogShow(true);
+                  }
+                  else
+                  {
+                    toastr.options = {
+                      positionClass: "toast-top-right",
+                      hideDuration: 300,
+                      timeOut: 2000,
+                    };
+                    toastr.clear();
+                    setTimeout(() => toastr.error(`Please login first!`), 300);
+                  }
                 }}
               >
                 Save

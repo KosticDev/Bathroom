@@ -9,6 +9,15 @@ body {
   overflow: hidden;
 }
 
+.newPlanBtn{
+  background-color: white;
+}
+
+.newPlanBtn:hover{
+  background-color: #ebb3fc;
+}
+
+
 #loading_spinner {
   position: fixed;
   top: 0;
