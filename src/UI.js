@@ -431,29 +431,43 @@ const onmouseup = (e) => {
     objectIntersects[0].object.visible == true
   ) {
     hoverItem = objectIntersects[0].object;
-    hoverItem.material.visible = true;
-
-    if (selectedFlag) {
-      temp_object.material.visible = false;
-    } else {
-      selectedFlag = true;
+    var tempObject = hoverItem;
+    while (1) {
+      if (
+        tempObject.userData.type !== undefined &&
+        tempObject.userData.type !== null
+      )
+        break;
+      if (tempObject === null) break;
+      tempObject = tempObject.parent;
     }
-    temp_object = hoverItem;
-    temp_object_real = objectIntersects[1]?.object ?? null;
+    if (tempObject !== null)
+    {
+      hoverItem = tempObject;
+      hoverItem.material.visible = true;
 
-    $(".functionBoard").css({ display: "block" });
-    if (temp_object.userData.type === "door") {
-      getObjectColor(temp_object);
-      let redColor = parseInt(255 * obtainedObjectColor.r);
-      let greenColor = parseInt(255 * obtainedObjectColor.g);
-      let blueColor = parseInt(255 * obtainedObjectColor.b);
-      $(".colorBoard").css({ display: "block" });
-      document.getElementsByClassName("colorBoard")[0].value = rgbToHex(
-        redColor,
-        greenColor,
-        blueColor
-      );
-      obtainedObjectColor = null;
+      if (selectedFlag) {
+        temp_object.material.visible = false;
+      } else {
+        selectedFlag = true;
+      }
+      temp_object = hoverItem;
+      temp_object_real = objectIntersects[1]?.object ?? null;
+
+      $(".functionBoard").css({ display: "block" });
+      if (temp_object.userData.type === "door") {
+        getObjectColor(temp_object);
+        let redColor = parseInt(255 * obtainedObjectColor.r);
+        let greenColor = parseInt(255 * obtainedObjectColor.g);
+        let blueColor = parseInt(255 * obtainedObjectColor.b);
+        $(".colorBoard").css({ display: "block" });
+        document.getElementsByClassName("colorBoard")[0].value = rgbToHex(
+          redColor,
+          greenColor,
+          blueColor
+        );
+        obtainedObjectColor = null;
+      }
     }
   } else if (hoverItem && !isDrag) {
     hoverItem.material.visible = false;
