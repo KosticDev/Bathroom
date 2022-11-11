@@ -17,9 +17,18 @@ const Navbar = (props) => {
   return (
     <div className="header">
       <div className="d-flex justify-content-between p-2  h-100">
-        <div className="logo">
+        <div className="logo flex flex-row">
           <img
             src="logo.png"
+            className="h-[45px] cursor-pointer"
+            alt=""
+            onClick={(e) => {
+              e.preventDefault();
+              window.location.href = "/";
+            }}
+          />
+          <img
+            src="logo1.png"
             className="h-[45px] cursor-pointer"
             alt=""
             onClick={(e) => {

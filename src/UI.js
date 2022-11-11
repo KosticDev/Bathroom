@@ -116,6 +116,7 @@ const labelRenderer = new CSS2DRenderer();
 renderer.outputEncoding = THREE.sRGBEncoding;
 
 const orbitControls = new OrbitControls(camera, renderer.domElement);
+//console.log('renderer',renderer.domElement);
 
 function initOrbit() {
   orbitControls.minDistance = 3;
