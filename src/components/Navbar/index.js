@@ -20,7 +20,7 @@ const Navbar = (props) => {
         <div className="logo flex flex-row">
           <img
             src="logo.png"
-            className="h-[45px] cursor-pointer"
+            className="h-[45px] cursor-pointer mr-0 logoImg"
             alt=""
             onClick={(e) => {
               e.preventDefault();
