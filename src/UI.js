@@ -325,13 +325,6 @@ function animate() {
   if (STORE.view === 1) {
     renderer.render(scene, camera);
     orbitControls.update();
-    // let isDoor = false;
-    // for (let index = 0; index < rayWalls.length; index++) {
-    //     if (temp_door.userData.normalAxis === rayWalls[index].userData.normalAxis && temp_door.userData.dir === rayWalls[index].userData.dir) {
-    //         isDoor = true;
-    //     }
-    // }
-    // temp_door.chlldren[0].children[0].material.visible = isDoor;
   } else {
     renderer.render(scene, orthoCam);
     labelRenderer.render(scene, orthoCam);
@@ -370,15 +363,31 @@ const onmousedown = (e) => {
     mouse.y = -((e.touches[0].clientY - rect.top) / rect.height) * 2 + 1;
   }
 
-  raycaster.setFromCamera(mouse, camera);
+  if (STORE.view === 1) {
+    raycaster.setFromCamera(mouse, camera);
+  } else {
+    raycaster.setFromCamera(mouse, orthoCam);
+  }
 
   var objectIntersects = raycaster.intersectObjects(objects);
 
   if (objectIntersects.length > 0 && isMouseDown) {
-    selectedItem = objectIntersects[0].object;
-    console.log("Mouse Down", selectedItem);
-    savePositionData(0, selectedItem);
-    orbitControls.enabled = false;
+    var tempObject = objectIntersects[0].object;
+    while (1) {
+      if (
+        tempObject.userData.type !== undefined &&
+        tempObject.userData.type !== null
+      )
+        break;
+      if (tempObject === null) break;
+      tempObject = tempObject.parent;
+    }
+    if (tempObject !== null) {
+      selectedItem = tempObject;
+      console.log("Mouse Down", selectedItem);
+      savePositionData(0, selectedItem);
+      orbitControls.enabled = false;
+    }
   }
 };
 
@@ -388,7 +397,6 @@ function getObjectColor(object) {
       obtainedObjectColor = object.material.color;
     }
   }
-  console.log(object);
   if (object.children !== []) {
     console.log(object.children.length);
     for (let i = 0; i < object.children.length; i++) {
@@ -431,11 +439,10 @@ const onmouseup = (e) => {
       selectedFlag = true;
     }
     temp_object = hoverItem;
-    temp_object_real = objectIntersects[1].object;
+    temp_object_real = objectIntersects[1]?.object ?? null;
 
     $(".functionBoard").css({ display: "block" });
     if (temp_object.userData.type === "door") {
-      console.log(temp_object);
       getObjectColor(temp_object);
       let redColor = parseInt(255 * obtainedObjectColor.r);
       let greenColor = parseInt(255 * obtainedObjectColor.g);
@@ -973,14 +980,17 @@ function loadDoor(url, num, num1, objColor) {
         ),
         InvisibleMat
       );
-      temp_door.geometry.translate(0, wallItems.door.height * 0.5, 0);
+      temp_door.geometry.translate(0, wallItems.door.height * 0.5, 0.01);
       temp_door.position.set(0, 0, -STORE.Length / 2 - 0.02);
       temp_door.userData.normalAxis = AXIS.Z;
       temp_door.userData.normalVector = new Vector3(0, 0, 1);
       temp_door.userData.dir = DIR.START;
       temp_door.userData.type = "door";
       temp_door.userData.url = url;
+
       door = gltf.scene;
+      door.position.z = "0.01";
+      console.log("position", door);
       door.scale.x = num;
       door.scale.y = num;
       door.scale.z = num / 2;
@@ -2069,12 +2079,9 @@ const UI = observer(() => {
                 className="py-[10px] px-[40px] border-[1px] border-gray-600 rounded-[5px]"
                 onClick={(e) => {
                   e.preventDefault();
-                  if (localStorage.getItem("bathroom_login") === "true")
-                  {
+                  if (localStorage.getItem("bathroom_login") === "true") {
                     setSaveDialogShow(true);
-                  }
-                  else
-                  {
+                  } else {
                     toastr.options = {
                       positionClass: "toast-top-right",
                       hideDuration: 300,
