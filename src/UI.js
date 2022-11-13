@@ -441,8 +441,7 @@ const onmouseup = (e) => {
       if (tempObject === null) break;
       tempObject = tempObject.parent;
     }
-    if (tempObject !== null)
-    {
+    if (tempObject !== null) {
       hoverItem = tempObject;
       hoverItem.material.visible = true;
 
@@ -1537,7 +1536,26 @@ const UI = observer(() => {
               {" "}
               Room Layout
             </h6>
-            <span className="close">X</span>
+            <span
+              className="close"
+              onClick={(e) => {
+                e.preventDefault();
+                setIsCategory(1 - isCategory);
+                setMenuOption([
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                ]);
+              }}
+            >
+              X
+            </span>
           </div>
           <div className="d-flex flex-wrap w-100">
             <h6
@@ -1695,7 +1713,26 @@ const UI = observer(() => {
             >
               Bathroom Elements
             </h6>
-            <span className="close">X</span>
+            <span
+              className="close"
+              onClick={(e) => {
+                e.preventDefault();
+                setIsCategory(1 - isCategory);
+                setMenuOption([
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                ]);
+              }}
+            >
+              X
+            </span>
           </div>
           <div className="d-flex flex-wrap w-100">
             <h6
@@ -1798,6 +1835,17 @@ const UI = observer(() => {
               onClick={(e) => {
                 e.preventDefault();
                 setIsCategory(1 - isCategory);
+                setMenuOption([
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                ]);
               }}
             >
               X
@@ -1914,6 +1962,17 @@ const UI = observer(() => {
               className="close"
               onClick={(e) => {
                 e.preventDefault();
+                setMenuOption([
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                ]);
                 setIsCategory(1 - isCategory);
               }}
             >
@@ -2026,6 +2085,17 @@ const UI = observer(() => {
               onClick={(e) => {
                 e.preventDefault();
                 setIsCategory(1 - isCategory);
+                setMenuOption([
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                ]);
               }}
             >
               X
@@ -2044,7 +2114,26 @@ const UI = observer(() => {
             >
               Consultation
             </h6>
-            <span className="close">X</span>
+            <span
+              className="close"
+              onClick={(e) => {
+                e.preventDefault();
+                setIsCategory(1 - isCategory);
+                setMenuOption([
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                ]);
+              }}
+            >
+              X
+            </span>
           </div>
         </div>
 
@@ -2059,7 +2148,26 @@ const UI = observer(() => {
             >
               Exit Plan
             </h6>
-            <span className="close">X</span>
+            <span
+              className="close"
+              onClick={(e) => {
+                e.preventDefault();
+                setIsCategory(1 - isCategory);
+                setMenuOption([
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                ]);
+              }}
+            >
+              X
+            </span>
           </div>
           <div className="flex flex-col w-100 justify-center">
             {STORE.fetchedObjectData.map((data) => {
