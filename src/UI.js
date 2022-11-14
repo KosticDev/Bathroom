@@ -198,37 +198,18 @@ function initLight() {
   scene.add( light );
   light.position.set(0,2,0);
   */
+  /*
   global_light = new THREE.HemisphereLight("white", "", 0.5);
   global_light.position.set(0, STORE.Height, 0);
+  */
+  light_1 = new THREE.PointLight("white", 1, 0, 1);
 
-  light_1 = new THREE.PointLight("white", 0.1, 0, 1);
-  light_2 = new THREE.PointLight("white", 0.2, 0, 1);
-  light_3 = new THREE.PointLight("white", 0.2, 0, 1);
-  light_4 = new THREE.PointLight("white", 0.2, 0, 1);
-  light_5 = new THREE.PointLight("white", 0.2, 0, 1);
-  light_6 = new THREE.PointLight("white", 0.2, 0, 1);
-  light_7 = new THREE.PointLight("white", 0.2, 0, 1);
-  light_8 = new THREE.PointLight("white", 0.2, 0, 1);
 
-  light_1.position.set(0, STORE.Height / 2, 0);
-  light_2.position.set(STORE.Width / 2, STORE.Height / 2, 0);
-  light_3.position.set(STORE.Width, 1, 0);
-  light_4.position.set(-STORE.Width, 1, 0);
-  light_5.position.set(0, 1, STORE.Height);
-  light_6.position.set(0, 1, -STORE.Height);
-  light_7.position.set(0, 0, STORE.Height);
-  light_8.position.set(0, 0, -STORE.Height);
+  light_1.position.set(0, STORE.Height / 10*9, 0);
+
 
   scene.add(
-    global_light,
     light_1,
-    light_2,
-    light_3,
-    light_4,
-    light_5,
-    light_6,
-    light_7,
-    light_8
   );
 }
 
