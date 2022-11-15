@@ -1,6 +1,14 @@
 import { observer } from "mobx-react-lite";
+import { v4 as uuid_v4 } from "uuid";
 import React, { useEffect, useState } from "react";
-import { collection, addDoc, getDocs } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
 import { db } from "./components/Firebase/firebaseConfig";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
@@ -51,7 +59,6 @@ let temp_bathtub = null;
 let temp_bathtub1 = null;
 let temp_bathtub2 = null;
 let temp_tapware = null;
-let temp_door = null;
 let temp_shower = null;
 let model;
 let temp_model;
@@ -88,7 +95,7 @@ const mouseRemember = new THREE.Vector2();
 const canvas = document.createElement("canvas");
 
 let scene = new THREE.Scene();
-scene.background = new THREE.Color(0x808080);
+scene.background = new THREE.Color(0x000000);
 
 const camera = new THREE.PerspectiveCamera(
   45,
@@ -109,6 +116,7 @@ const labelRenderer = new CSS2DRenderer();
 renderer.outputEncoding = THREE.sRGBEncoding;
 
 const orbitControls = new OrbitControls(camera, renderer.domElement);
+//console.log('renderer',renderer.domElement);
 
 function initOrbit() {
   orbitControls.minDistance = 3;
@@ -129,6 +137,7 @@ const orthoCam = new THREE.OrthographicCamera(
 
 var mapControls;
 var global_light;
+var light_0;
 var light_1;
 var light_2;
 var light_3;
@@ -180,35 +189,44 @@ window.addEventListener("wheel", function (event) {
 });
 
 function initLight() {
-  const Ambientlight = new THREE.AmbientLight("white", 0.1); // soft white light
-  global_light = new THREE.HemisphereLight("white", "", 0.5);
-  light_1 = new THREE.PointLight("white", 0.2, 20, 1);
-  light_2 = new THREE.PointLight("white", 0.2, 20, 1);
-  light_3 = new THREE.PointLight("white", 0.2, 20, 1);
-  light_4 = new THREE.PointLight("white", 0.2, 20, 1);
-  light_5 = new THREE.PointLight("white", 0.2, 20, 1);
-  light_6 = new THREE.PointLight("white", 0.2, 20, 1);
-  light_7 = new THREE.PointLight("white", 0.2, 20, 1);
-  light_8 = new THREE.PointLight("white", 0.2, 20, 1);
-  light_1.position.set(-5, 1.2, 0);
-  light_2.position.set(0, 1.2, -4);
-  light_3.position.set(0, 1.2, -4);
-  light_4.position.set(5, 1.2, 0);
+  const Ambientlight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.7); // soft white light
+  Ambientlight.position.set(0, 0, 0)
+  const Ambientlight1 = new THREE.AmbientLight("white", 0.01); // soft white light
 
-  //var Directionlight = new THREE.DirectionalLight("white", 0.5);
+  light_0 = new THREE.DirectionalLight(0xffffff, 1);
+  light_0.position.set(-3, STORE.Height / 10*1, -3);
+  light_1 = new THREE.DirectionalLight(0xffffff, 1);
+  light_1.position.set(3, STORE.Height / 10*1, 3);
+  light_2 = new THREE.PointLight(0xffffff, 1, 100);
+  light_2.position.set(0, STORE.Height / 10*9, 0);
+  light_3 = new THREE.PointLight(0xffffff, 1, 100);
+  light_3.position.set(0, STORE.Height / 10*9, 0);
+  light_4 = new THREE.PointLight(0xffffff, 0.5, 100);
+  light_4.position.set(-5, STORE.Height / 1000, 5);
+  light_5 = new THREE.PointLight(0xffffff, 0.5, 100);
+  light_5.position.set(-5, STORE.Height / 1000, -5);
+  light_6 = new THREE.PointLight(0xffffff, 0.5, 100);
+  light_6.position.set(5, STORE.Height / 1000, -5);
+  light_7 = new THREE.PointLight(0xffffff, 0.5, 100);
+  light_7.position.set(5, STORE.Height / 1000, 5);
+
+
+  var test = new THREE.AmbientLight(0xbbbbbb);
+  // test.position.set(0,STORE.Height / 10*9,0);
+
 
   scene.add(
-    global_light,
-    light_1,
+    // test,
+    // light_0,
+    // light_1,
     light_2,
     light_3,
     light_4,
     light_5,
     light_6,
     light_7,
-    light_8
+    // Ambientlight
   );
-  global_light.position.set(10, 10, 10);
 }
 
 // const box = new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshStandardMaterial({ side: THREE.BackSide, transparent: true, color :'white' }));
@@ -304,13 +322,6 @@ function animate() {
   if (STORE.view === 1) {
     renderer.render(scene, camera);
     orbitControls.update();
-    // let isDoor = false;
-    // for (let index = 0; index < rayWalls.length; index++) {
-    //     if (temp_door.userData.normalAxis === rayWalls[index].userData.normalAxis && temp_door.userData.dir === rayWalls[index].userData.dir) {
-    //         isDoor = true;
-    //     }
-    // }
-    // temp_door.chlldren[0].children[0].material.visible = isDoor;
   } else {
     renderer.render(scene, orthoCam);
     labelRenderer.render(scene, orthoCam);
@@ -349,27 +360,40 @@ const onmousedown = (e) => {
     mouse.y = -((e.touches[0].clientY - rect.top) / rect.height) * 2 + 1;
   }
 
-  raycaster.setFromCamera(mouse, camera);
+  if (STORE.view === 1) {
+    raycaster.setFromCamera(mouse, camera);
+  } else {
+    raycaster.setFromCamera(mouse, orthoCam);
+  }
 
   var objectIntersects = raycaster.intersectObjects(objects);
 
   if (objectIntersects.length > 0 && isMouseDown) {
-    selectedItem = objectIntersects[0].object;
-    console.log("Mouse Down", selectedItem);
-    savePositionData(0, selectedItem);
-    orbitControls.enabled = false;
+    var tempObject = objectIntersects[0].object;
+    while (1) {
+      if (
+        tempObject.userData.type !== undefined &&
+        tempObject.userData.type !== null
+      )
+        break;
+      if (tempObject === null) break;
+      tempObject = tempObject.parent;
+    }
+    if (tempObject !== null) {
+      selectedItem = tempObject;
+      console.log("Mouse Down", selectedItem);
+      savePositionData(0, selectedItem);
+      orbitControls.enabled = false;
+    }
   }
 };
 
 function getObjectColor(object) {
-  if (object.material !== undefined && object.material.color !== undefined )
-  {
-    if (object.userData.type !== 'door' && obtainedObjectColor === null)
-    {
+  if (object.material !== undefined && object.material.color !== undefined) {
+    if (object.userData.type !== "door" && obtainedObjectColor === null) {
       obtainedObjectColor = object.material.color;
     }
   }
-  console.log(object);
   if (object.children !== []) {
     console.log(object.children.length);
     for (let i = 0; i < object.children.length; i++) {
@@ -404,27 +428,42 @@ const onmouseup = (e) => {
     objectIntersects[0].object.visible == true
   ) {
     hoverItem = objectIntersects[0].object;
-    hoverItem.material.visible = true;
-
-    if (selectedFlag) {
-      temp_object.material.visible = false;
-    } else {
-      selectedFlag = true;
+    var tempObject = hoverItem;
+    while (1) {
+      if (
+        tempObject.userData.type !== undefined &&
+        tempObject.userData.type !== null
+      )
+        break;
+      if (tempObject === null) break;
+      tempObject = tempObject.parent;
     }
-    temp_object = hoverItem;
-    temp_object_real = objectIntersects[1].object;
+    if (tempObject !== null) {
+      hoverItem = tempObject;
+      hoverItem.material.visible = true;
 
-    $(".functionBoard").css({ display: "block" });
-    if (temp_object.userData.type === 'door')
-    {
-      console.log(temp_object);
-      getObjectColor(temp_object);
-      let redColor = parseInt(255 * obtainedObjectColor.r);
-      let greenColor = parseInt(255 * obtainedObjectColor.g);
-      let blueColor = parseInt(255 * obtainedObjectColor.b);
-      $(".colorBoard").css({ display: "block" });
-      document.getElementsByClassName('colorBoard')[0].value = rgbToHex(redColor, greenColor, blueColor);
-      obtainedObjectColor = null;
+      if (selectedFlag) {
+        temp_object.material.visible = false;
+      } else {
+        selectedFlag = true;
+      }
+      temp_object = hoverItem;
+      temp_object_real = objectIntersects[1]?.object ?? null;
+
+      $(".functionBoard").css({ display: "block" });
+      if (temp_object.userData.type === "door") {
+        getObjectColor(temp_object);
+        let redColor = parseInt(255 * obtainedObjectColor.r);
+        let greenColor = parseInt(255 * obtainedObjectColor.g);
+        let blueColor = parseInt(255 * obtainedObjectColor.b);
+        $(".colorBoard").css({ display: "block" });
+        document.getElementsByClassName("colorBoard")[0].value = rgbToHex(
+          redColor,
+          greenColor,
+          blueColor
+        );
+        obtainedObjectColor = null;
+      }
     }
   } else if (hoverItem && !isDrag) {
     hoverItem.material.visible = false;
@@ -467,22 +506,29 @@ $("body").keydown(function (event) {
 
 function deleteObject() {
   if (temp_object_real != null) {
+    for (let i = 0; i < objects.length; i++) {
+      if (objects[i].uuid === temp_object.uuid) {
+        objects.splice(i, 1);
+        break;
+      }
+    }
+
     temp_object.parent.remove(temp_object);
-    /*
-    temp_object.visible = false;
-    temp_object_real.visible = false;
-    temp_object_real = null;
-    */
   }
 }
 
 function changeColor(e) {
   e.preventDefault();
-  let hexColor = document.getElementsByClassName('colorBoard')[0].value;
+  let hexColor = document.getElementsByClassName("colorBoard")[0].value;
   hexColor = hexColor.slice(1);
   var aRgbHex = hexColor.match(/.{1,2}/g);
-  let objColor = { r: parseInt(aRgbHex[0], 16)/255, g: parseInt(aRgbHex[1], 16)/255, b: parseInt(aRgbHex[2], 16)/255, isColor: true };
-  objectTraverse(temp_object, objColor)
+  let objColor = {
+    r: parseInt(aRgbHex[0], 16) / 255,
+    g: parseInt(aRgbHex[1], 16) / 255,
+    b: parseInt(aRgbHex[2], 16) / 255,
+    isColor: true,
+  };
+  objectTraverse(temp_object, objColor);
 }
 
 window.addEventListener("mousemove", onmousemove);
@@ -891,15 +937,6 @@ function createWalls(type, material) {
 
 function GenerateBathroom() {
   orthoCam.position.y = STORE.Height + DELTA_DIS;
-  light_1.position.set(-STORE.Width / 2, STORE.Height, 0);
-  light_2.position.set(STORE.Width / 2, STORE.Height, 0);
-  light_3.position.set(STORE.Width, 1, 0);
-  light_4.position.set(-STORE.Width, 1, 0);
-  light_5.position.set(0, 1, STORE.Height);
-  light_6.position.set(0, 1, -STORE.Height);
-  light_7.position.set(0, 0, STORE.Height);
-  light_8.position.set(0, 0, -STORE.Height);
-
   createWalls(STORE.type, STORE.material);
 }
 
@@ -933,6 +970,7 @@ function objectTraverse(object, objColor) {
 }
 
 function loadDoor(url, num, num1, objColor) {
+  $("#loading_spinner").fadeIn(300);
   gltfLoader.load(
     // resource URL
     url,
@@ -944,7 +982,7 @@ function loadDoor(url, num, num1, objColor) {
         transparent: true,
         opacity: 0.3,
       });
-      temp_door = new THREE.Mesh(
+      let temp_door = new THREE.Mesh(
         new THREE.BoxGeometry(
           wallItems.door.width,
           wallItems.door.height,
@@ -952,19 +990,23 @@ function loadDoor(url, num, num1, objColor) {
         ),
         InvisibleMat
       );
-      temp_door.geometry.translate(0, wallItems.door.height * 0.5, 0);
+      temp_door.geometry.translate(0, wallItems.door.height * 0.5, 0.01);
       temp_door.position.set(0, 0, -STORE.Length / 2 - 0.02);
       temp_door.userData.normalAxis = AXIS.Z;
       temp_door.userData.normalVector = new Vector3(0, 0, 1);
       temp_door.userData.dir = DIR.START;
       temp_door.userData.type = "door";
+      temp_door.userData.url = url;
+
       door = gltf.scene;
+      door.position.z = "0.01";
+      console.log("position", door);
       door.scale.x = num;
       door.scale.y = num;
       door.scale.z = num / 2;
 
       //let objColor = { r: 1, g: 0, b: 0, isColor: true };
-      if (objColor !== undefined && objColor !==null)
+      if (objColor !== undefined && objColor !== null)
         objectTraverse(door, objColor);
 
       temp_door.add(door);
@@ -972,9 +1014,13 @@ function loadDoor(url, num, num1, objColor) {
       objects.push(temp_door);
     }
   );
+  setTimeout(function () {
+    $("#loading_spinner").fadeOut(300);
+  }, 500);
 }
 
 function Window(url, num, num1) {
+  $("#loading_spinner").fadeIn(300);
   gltfLoader.load(
     // resource URL
     url,
@@ -986,7 +1032,7 @@ function Window(url, num, num1) {
         transparent: true,
         opacity: 0.3,
       });
-      temp_door = new THREE.Mesh(
+      let temp_door = new THREE.Mesh(
         new THREE.BoxGeometry(
           wallItems.door.width,
           wallItems.door.height / 2,
@@ -999,6 +1045,8 @@ function Window(url, num, num1) {
       temp_door.userData.normalAxis = AXIS.Z;
       temp_door.userData.normalVector = new Vector3(0, 0, 1);
       temp_door.userData.dir = DIR.START;
+      temp_door.userData.url = url;
+      temp_door.userData.type = "window";
       door = gltf.scene;
       door.scale.x = num;
       door.scale.y = num;
@@ -1008,205 +1056,25 @@ function Window(url, num, num1) {
       objects.push(temp_door);
     }
   );
-}
-
-function Shower() {
-  gltfLoader.load(
-    // resource URL
-    "assets/doors/shower.glb",
-    // called when the resource is loaded
-    function (gltf) {
-      shower = gltf.scene;
-      InvisibleMat = new THREE.MeshBasicMaterial({
-        color: "red",
-        visible: false,
-        transparent: true,
-        opacity: 0.3,
-      });
-      temp_shower = new THREE.Mesh(
-        new THREE.BoxGeometry(
-          wallItems.shower.width,
-          wallItems.shower.height,
-          wallItems.shower.depth * 5
-        ),
-        InvisibleMat
-      );
-      temp_shower.geometry.translate(0, wallItems.shower.height * 0.5, 0);
-      temp_shower.position.set(0, 0, -STORE.Length / 2 - 0.1);
-      temp_shower.userData.normalAxis = AXIS.Z;
-      temp_shower.userData.normalVector = new Vector3(0, 0, 1);
-      shower.children[0].material.visible = true;
-      temp_shower.userData.dir = DIR.START;
-      temp_shower.add(shower);
-      scene.add(temp_shower);
-      objects.push(temp_shower);
-    }
-  );
-}
-
-function loadBathtub(URL) {
-  gltfLoader.load(
-    // resource URL
-    URL,
-    function (gltf) {
-      bathtub = gltf.scene;
-      bathtub.scale.x = 0.9;
-      bathtub.scale.y = 0.9;
-      bathtub.scale.z = 0.9;
-      bathtub.rotation.y = Math.PI;
-      bathtub.position.x = -1.4;
-      InvisibleMat = new THREE.MeshBasicMaterial({
-        color: "red",
-        visible: false,
-        transparent: true,
-        opacity: 0.3,
-      });
-      temp_bathtub = new THREE.Mesh(
-        new THREE.BoxGeometry(
-          wallItems.bathtub.width - 0.45,
-          wallItems.bathtub.height,
-          wallItems.bathtub.depth - 0.37
-        ),
-        InvisibleMat
-      );
-      temp_bathtub.geometry.translate(0, wallItems.bathtub.height * 0.5, 0);
-      temp_bathtub.position.set(-1, 0, -1);
-      temp_bathtub.userData.normalAxis = AXIS.Y;
-      bathtub.children[0].material.visible = true;
-      temp_bathtub.add(bathtub);
-      scene.add(temp_bathtub);
-      objects.push(temp_bathtub);
-    }
-  );
-}
-
-function loadBathtub2(URL, num, num1) {
-  gltfLoader.load(
-    // resource URL
-    URL,
-    function (gltf) {
-      bathtub2 = gltf.scene;
-      bathtub2.scale.x = 0.9;
-      bathtub2.scale.y = 0.9;
-      bathtub2.scale.z = 0.9;
-      bathtub2.rotation.y = Math.PI;
-      InvisibleMat = new THREE.MeshBasicMaterial({
-        color: "red",
-        visible: false,
-        transparent: true,
-        opacity: 0.3,
-      });
-      temp_bathtub2 = new THREE.Mesh(
-        new THREE.BoxGeometry(
-          wallItems.bathtub2.width - num,
-          wallItems.bathtub2.height,
-          wallItems.bathtub2.depth - num1
-        ),
-        InvisibleMat
-      );
-      temp_bathtub2.geometry.translate(0, wallItems.bathtub2.height * 0.5, 0);
-      temp_bathtub2.position.set(1, 0, 1);
-      temp_bathtub2.userData.normalAxis = AXIS.Y;
-      // bathtub2.children[0].material.visible = true;
-      temp_bathtub2.add(bathtub2);
-      scene.add(temp_bathtub2);
-      objects.push(temp_bathtub2);
-    }
-  );
-}
-
-function loadBathtub1() {
-  gltfLoader.load(
-    // resource URL
-    "assets/doors/bathtub.glb",
-    function (gltf) {
-      bathtub1 = gltf.scene;
-      bathtub1.scale.x = 0.25;
-      bathtub1.scale.y = 0.25;
-      bathtub1.scale.z = 0.25;
-      bathtub1.rotation.y = Math.PI / 2;
-      InvisibleMat = new THREE.MeshBasicMaterial({
-        color: "red",
-        visible: false,
-        transparent: true,
-        opacity: 0.3,
-      });
-      temp_bathtub1 = new THREE.Mesh(
-        new THREE.BoxGeometry(
-          wallItems.bathtub1.width,
-          wallItems.bathtub1.height,
-          wallItems.bathtub1.depth
-        ),
-        InvisibleMat
-      );
-      temp_bathtub1.geometry.translate(0, wallItems.bathtub1.height * 0.5, 0);
-      temp_bathtub1.userData.normalAxis = AXIS.Y;
-      bathtub1.children[0].material.visible = true;
-      temp_bathtub1.add(bathtub1);
-      scene.add(temp_bathtub1);
-      objects.push(temp_bathtub1);
-    }
-  );
-}
-
-function loadTapware(URL, num, num1, num2) {
-  gltfLoader.load(
-    // resource URL
-    URL,
-    function (gltf) {
-      tapware = gltf.scene;
-      tapware.scale.y = 2;
-      tapware.scale.x = 2;
-      tapware.scale.z = 2;
-      tapware.rotation.y = Math.PI;
-      InvisibleMat = new THREE.MeshBasicMaterial({
-        color: "red",
-        visible: false,
-        transparent: true,
-        opacity: 0.3,
-      });
-      temp_tapware = new THREE.Mesh(
-        new THREE.BoxGeometry(
-          wallItems.tapware.width / 10 - num,
-          wallItems.tapware.height / 2 - num2,
-          wallItems.tapware.depth / 2 - num1
-        ),
-        InvisibleMat
-      );
-      temp_tapware.geometry.translate(0, wallItems.tapware.height * 0.01, 0);
-      temp_tapware.position.set(1, 0.12, 1);
-      temp_tapware.userData.normalAxis = AXIS.Y;
-      // tapware.children[0].material.visible = true;
-      temp_tapware.add(tapware);
-      scene.add(temp_tapware);
-      objects.push(temp_tapware);
-    }
-  );
+  setTimeout(function () {
+    $("#loading_spinner").fadeOut(300);
+  }, 500);
 }
 
 function loadModel(URL) {
+  $("#loading_spinner").fadeIn(300);
   gltfLoader.load(
     // resource URL
     URL,
     function (gltf) {
       model = gltf.scene;
-      console.log("insert", model);
-      /*
-      model.rotation.x = -Math.PI / 2;
-      scene.add(model);
-      objects.push(model);
-      */
+      console.log("sdfasda",model)
+
       let bbox = new THREE.Box3().setFromObject(model);
       let size = bbox.getSize(new THREE.Vector3());
 
-      //model.scale.x = length / relative_ratio / size.x ;
-      //model.scale.y = height / relative_ratio / size.y ;
-      //model.scale.z = width / relative_ratio / size.z ;
       model.position.y = size.y * 0.5;
-      //model.geometry.translate(0, 0.5, 0);
 
-      //model.rotation.y = Math.PI / 2;
-      //model.children[0].material?.visible = true;
       InvisibleMat = new THREE.MeshBasicMaterial({
         color: "red",
         visible: false,
@@ -1218,18 +1086,201 @@ function loadModel(URL) {
         InvisibleMat
       );
       temp_model.userData.normalAxis = AXIS.Y;
+      temp_model.userData.url = URL;
       temp_model.geometry.translate(0, size.y * 0.5, 0);
-      //tapware.children[0].material.visible = true;
+      temp_model.userData.type = "other";
+
+      temp_model.add(model);
+      console.log(temp_model);
+      scene.add(temp_model);
+      objects.push(temp_model);
+      console.log("created", scene);
+      animate();
+    }
+  );
+  setTimeout(function () {
+    $("#loading_spinner").fadeOut(300);
+  }, 500);
+}
+
+const loadSavedModel = (object) => {
+  gltfLoader.load(
+    // resource URL
+    object.url,
+    function (gltf) {
+      model = gltf.scene;
+
+      model.position.x = object.inner.position.x;
+      model.position.y = object.inner.position.y;
+      model.position.z = object.inner.position.z;
+      model.scale.x = object.inner.scale.x;
+      model.scale.y = object.inner.scale.y;
+      model.scale.z = object.inner.scale.z;
+
+      InvisibleMat = new THREE.MeshBasicMaterial({
+        color: "red",
+        visible: false,
+        transparent: true,
+        opacity: 0.3,
+      });
+      temp_model = new THREE.Mesh(
+        new THREE.BoxGeometry(
+          object.outer.width,
+          object.outer.height,
+          object.outer.depth
+        ),
+        InvisibleMat
+      );
+
+      temp_model.userData = object.outer.userData;
+
+      temp_model.position.x = object.outer.position.x;
+      temp_model.position.y = object.outer.position.y;
+      temp_model.position.z = object.outer.position.z;
+      temp_model.scale.x = object.outer.scale.x;
+      temp_model.scale.y = object.outer.scale.y;
+      temp_model.scale.z = object.outer.scale.z;
+
+      if (object.outer.userData.type === "window") {
+        temp_model.geometry.translate(0, wallItems.door.height * 0.22, 0);
+      } else {
+        temp_model.geometry.translate(0, object.outer.height / 2, 0);
+      }
+
+      if (object.outer.color !== undefined && object.outer.color !== null) {
+        let color1 = {
+          r: object.outer.color.r,
+          g: object.outer.color.g,
+          b: object.outer.color.b,
+          isColor: true,
+        };
+        objectTraverse(model, color1);
+      }
+
       temp_model.add(model);
       scene.add(temp_model);
       objects.push(temp_model);
       animate();
     }
   );
-}
+};
 
+const getObjectData = async () => {
+  const q = query(collection(db, "object_data"));
+  let userId = localStorage.getItem("userId");
+  let objectData = [];
+
+  const querySnapshot = await getDocs(q);
+  querySnapshot.forEach((doc) => {
+    // doc.data() is never undefined for query doc snapshots
+    console.log(doc.id, " => ", doc.data());
+    let data = doc.data();
+    data = data.objectData.data;
+    data = JSON.parse(data);
+    data.id = doc.id;
+    if (data.userId === userId) {
+      objectData.push(data);
+    }
+  });
+  STORE.fetchedObjectData = objectData;
+};
+
+const deleteSavedObject = async (e, id) => {
+  e.preventDefault();
+  const docRef = doc(db, "object_data", id);
+  deleteDoc(docRef)
+    .then(() => {
+      console.log("Entire Document has been deleted successfully.");
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+  getObjectData();
+};
+
+const saveObjectData = async (title) => {
+  let objectData = {};
+  let userId = localStorage.getItem("userId");
+  objectData.userId = userId;
+  objectData.title = title;
+  objectData.type = STORE.type;
+  objectData.material = STORE.material;
+  let rawData = [];
+  for (let i = 0; i < scene.children.length; i++) {
+    if (
+      scene.children[i].userData.url !== undefined &&
+      scene.children[i].userData.url !== null
+    ) {
+      let outer = {};
+      let inner = {};
+      let url = scene.children[i].userData.url;
+      outer.userData = scene.children[i].userData;
+      outer.position = scene.children[i].position;
+      outer.scale = scene.children[i].scale;
+      outer.width = scene.children[i].geometry.parameters.width;
+      outer.height = scene.children[i].geometry.parameters.height;
+      outer.depth = scene.children[i].geometry.parameters.depth;
+
+      inner.position = scene.children[i].children[0].position;
+      inner.scale = scene.children[i].children[0].scale;
+
+      if (scene.children[i].userData.type === "door") {
+        getObjectColor(scene.children[i]);
+        outer.color = {};
+        outer.color.r = obtainedObjectColor.r;
+        outer.color.g = obtainedObjectColor.g;
+        outer.color.b = obtainedObjectColor.b;
+      }
+      rawData.push({ outer: outer, inner: inner, url: url });
+    }
+  }
+  objectData.data = rawData;
+  objectData = JSON.stringify(objectData);
+  objectData = { data: objectData };
+  const docRef = await addDoc(collection(db, "object_data"), {
+    objectData,
+  });
+  console.log("Document written with ID: ", docRef.id);
+
+  toastr.options = {
+    positionClass: "toast-top-right",
+    hideDuration: 300,
+    timeOut: 2000,
+  };
+  toastr.clear();
+  setTimeout(() => toastr.success(`Sucessfully done`), 300);
+
+  getObjectData();
+};
+
+const showSavedObjectData = (e, id) => {
+  e.preventDefault();
+  clearPositionData();
+  let objectData = {};
+  for (let i = 0; i < STORE.fetchedObjectData.length; i++) {
+    if (STORE.fetchedObjectData[i].id === id) {
+      objectData = STORE.fetchedObjectData[i];
+    }
+  }
+  objects = [];
+  scene = new THREE.Scene();
+  STORE.type = objectData.type;
+  STORE.material = objectData.material;
+  scene.background = new THREE.Color(0x808080);
+
+  initCamera();
+  initOrbit();
+  init();
+  initLight();
+  GenerateBathroom();
+
+  for (let i = 0; i < objectData.data.length; i++) {
+    loadSavedModel(objectData.data[i]);
+  }
+
+  animate();
+};
 const initThree = () => {
-  console.log("Hay!!");
   objects = [];
   scene = new THREE.Scene();
   initCamera();
@@ -1238,9 +1289,8 @@ const initThree = () => {
   initLight();
   GenerateBathroom();
   loadDoor("assets/doors/panel.glb", 1, 1);
-  loadModel("assets/bathtub.glb", 1000, 1800, 500);
+  loadModel("assets/bathtub.glb");
   animate();
-  console.log(objects);
 };
 initThree();
 
@@ -1282,6 +1332,8 @@ const UI = observer(() => {
   const [title, setTitle] = useState("");
   const [position, setPosition] = useState(-1);
   const [currentPosition, setCurrentPosition] = useState(-1);
+  const [saveDialogShow, setSaveDialogShow] = useState(false);
+  const [objectTitle, setObjectTitle] = useState("");
 
   const [header, setHeader] = useState("");
   const [category, setCategory] = useState("");
@@ -1467,6 +1519,7 @@ const UI = observer(() => {
         setIsCategory={setIsCategory}
         refresh={refresh}
         setRefresh={setRefresh}
+        getObjectData={getObjectData}
       />
       <div className="row content">
         <div
@@ -1481,7 +1534,26 @@ const UI = observer(() => {
               {" "}
               Room Layout
             </h6>
-            <span className="close">X</span>
+            <span
+              className="close"
+              onClick={(e) => {
+                e.preventDefault();
+                setIsCategory(1 - isCategory);
+                setMenuOption([
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                ]);
+              }}
+            >
+              X
+            </span>
           </div>
           <div className="d-flex flex-wrap w-100">
             <h6
@@ -1639,7 +1711,26 @@ const UI = observer(() => {
             >
               Bathroom Elements
             </h6>
-            <span className="close">X</span>
+            <span
+              className="close"
+              onClick={(e) => {
+                e.preventDefault();
+                setIsCategory(1 - isCategory);
+                setMenuOption([
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                ]);
+              }}
+            >
+              X
+            </span>
           </div>
           <div className="d-flex flex-wrap w-100">
             <h6
@@ -1742,6 +1833,17 @@ const UI = observer(() => {
               onClick={(e) => {
                 e.preventDefault();
                 setIsCategory(1 - isCategory);
+                setMenuOption([
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                ]);
               }}
             >
               X
@@ -1750,10 +1852,6 @@ const UI = observer(() => {
           {isCategory ? (
             <SubHeader
               loadModel={loadModel}
-              loadBathtub={loadBathtub}
-              loadBathtub2={loadBathtub2}
-              loadTapware={loadTapware}
-              shower={Shower}
               setShow={setShow}
               setIsCategory={setIsCategory}
               header={header}
@@ -1862,6 +1960,17 @@ const UI = observer(() => {
               className="close"
               onClick={(e) => {
                 e.preventDefault();
+                setMenuOption([
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                ]);
                 setIsCategory(1 - isCategory);
               }}
             >
@@ -1974,6 +2083,17 @@ const UI = observer(() => {
               onClick={(e) => {
                 e.preventDefault();
                 setIsCategory(1 - isCategory);
+                setMenuOption([
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                ]);
               }}
             >
               X
@@ -1992,7 +2112,26 @@ const UI = observer(() => {
             >
               Consultation
             </h6>
-            <span className="close">X</span>
+            <span
+              className="close"
+              onClick={(e) => {
+                e.preventDefault();
+                setIsCategory(1 - isCategory);
+                setMenuOption([
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                ]);
+              }}
+            >
+              X
+            </span>
           </div>
         </div>
 
@@ -2007,7 +2146,75 @@ const UI = observer(() => {
             >
               Exit Plan
             </h6>
-            <span className="close">X</span>
+            <span
+              className="close"
+              onClick={(e) => {
+                e.preventDefault();
+                setIsCategory(1 - isCategory);
+                setMenuOption([
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                  false,
+                ]);
+              }}
+            >
+              X
+            </span>
+          </div>
+          <div className="flex flex-col w-100 justify-center">
+            {STORE.fetchedObjectData.map((data) => {
+              return (
+                <div
+                  key={uuid_v4()}
+                  className="mx-[20px] rounded-[5px] p-[10px] mb-[10px] border-gray-200 border-[1px] flex flex-row justify-between items-center"
+                >
+                  <p
+                    onClick={(e) => {
+                      showSavedObjectData(e, data.id);
+                    }}
+                    className="cursor-pointer"
+                  >
+                    {data.title}
+                  </p>
+                  <div
+                    className="functionBoard"
+                    onClick={(e) => {
+                      deleteSavedObject(e, data.id);
+                    }}
+                  >
+                    <i className="fa fa-trash"></i>
+                  </div>
+                </div>
+              );
+            })}
+
+            <div className="m-auto">
+              <button
+                className="py-[10px] px-[40px] border-[1px] border-gray-600 rounded-[5px]"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (localStorage.getItem("bathroom_login") === "true") {
+                    setSaveDialogShow(true);
+                  } else {
+                    toastr.options = {
+                      positionClass: "toast-top-right",
+                      hideDuration: 300,
+                      timeOut: 2000,
+                    };
+                    toastr.clear();
+                    setTimeout(() => toastr.error(`Please login first!`), 300);
+                  }
+                }}
+              >
+                Save
+              </button>
+            </div>
           </div>
         </div>
         <div className="col-12 position-relative p-0 m-0">
@@ -2121,6 +2328,41 @@ const UI = observer(() => {
               />
             </div>
           </div>
+          {saveDialogShow && (
+            <div className="modal h-[50%] block">
+              <div className="create_window ">
+                <div className="grid gird-col-1 w-[100%] gap-3">
+                  <span
+                    className="close1"
+                    onClick={() => setSaveDialogShow(false)}
+                  >
+                    &times;
+                  </span>
+                  <label>
+                    <small>Title </small>
+                  </label>
+                  <input
+                    type="text"
+                    name="title"
+                    onChange={(e) => {
+                      e.preventDefault();
+                      setObjectTitle(e.target.value);
+                    }}
+                  />
+                  <button
+                    className="py-[10px] px-[40px] border-[1px] border-gray-600 rounded-[5px]"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      saveObjectData(objectTitle);
+                      setSaveDialogShow(false);
+                    }}
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
           <div
             className="modal"
             style={{
@@ -2166,6 +2408,11 @@ const UI = observer(() => {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+      <div id="loading_spinner">
+        <div className="cv_spinner">
+          <span className="span_spinner"></span>
         </div>
       </div>
     </div>

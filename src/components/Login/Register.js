@@ -12,6 +12,9 @@ export default function Register() {
     const [errorMessages, setErrorMessages] = useState({});
     const [isSubmitted, setIsSubmitted] = useState(false);
 
+    let linkTo = "/";
+    if (localStorage.getItem('new_plan') === "true") linkTo = "/main";
+
     const navigate = useNavigate();
 
     const handleSubmit = async (event) => {
@@ -96,7 +99,7 @@ export default function Register() {
     return (
         <div className="login">
             <div className='main_login'>
-                <Link to='/' className='return'>
+                <Link to={linkTo} className='return'>
                     <i className='fa fa-arrow-left'></i>
                     <span> Return to homepage</span>
                 </Link>

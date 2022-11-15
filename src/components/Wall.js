@@ -3,7 +3,7 @@ import { Vector3 } from "three";
 import { AXIS, DIR, WALL_MAP, STORE, TILE_SIZE } from "../Constant";
 
 const textLoader = new THREE.TextureLoader();
-const wallMat = new THREE.MeshStandardMaterial({ color: "white" });
+const wallMat = new THREE.MeshPhysicalMaterial({ color: "white", reflectivity: 1.0,transmission:1.0,specularIntensity : 0.6 });
 class Wall extends THREE.Mesh {
   constructor(initlength, initheight, pos, norVec, dir, cut, material) {
     super(new THREE.BoxGeometry(0.1, initheight, initlength), wallMat);

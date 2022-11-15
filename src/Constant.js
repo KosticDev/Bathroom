@@ -37,6 +37,7 @@ export const WALL_MAP = [
 ]
 
 export const STORE = observable({
+    fetchedObjectData: [],
     width: 5000,
     length: 4000,
     cwidth: 2000,
@@ -49,6 +50,10 @@ export const STORE = observable({
     scale : 1,
     change : 0,
     material : 1,
+
+    get FetchedObjectData() {
+        return this.fetchedObjectData;
+    },
 
     get Material() {
         return this.material;

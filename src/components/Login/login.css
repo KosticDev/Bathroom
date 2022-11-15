@@ -76,8 +76,10 @@ input[type=submit] {
 
 input {
     outline: none;
-    border: none;
-    box-shadow: inset -2px -2px 6px 0 rgb(164 52 203 / 12%), inset -1px -1px 4px 0 rgb(164 52 203 / 8%), 1px 0 4px 0 rgb(164 52 203 / 8%)
+    border-width: 1px;
+    padding: 5px;
+    border-color: gray;
+    border-radius: 5px;
 }
 
 .input-container {

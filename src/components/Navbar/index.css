@@ -1,6 +1,5 @@
 .header {
     width:100%;
-    padding:5px;
     height:60px;
     top:0px;
     left:0px;
@@ -16,4 +15,16 @@
 .b_login > a {
     text-decoration: none;
 
+}
+
+.logoutBtn {
+    color: black;
+}
+
+.logoutBtn:hover {
+    color: #0d3f8f;
+}
+
+.logoImg{
+    margin-right: 5px !important;
 }
